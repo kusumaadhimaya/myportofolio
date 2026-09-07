@@ -193,3 +193,52 @@ h1, .brand {
         justify-content: flex-start;
     }
 }
+
+/* Skills & Capabilities Section */
+.skills-section {
+    padding: 4rem 0;
+    border-top: 1px solid var(--line);
+}
+
+.section-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--ink);
+}
+
+/* Responsive CSS Grid for Cards */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.skill-card {
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 4px 0px var(--accent);
+}
+
+.skill-card h3 {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+}
+
+.skill-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
