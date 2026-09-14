@@ -24,3 +24,12 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Skill(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    tags = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.title

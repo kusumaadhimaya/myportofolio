@@ -194,7 +194,7 @@ h1, .brand {
     }
 }
 
-/* Skills & Capabilities Section */
+/* Skills Section */
 .skills-section {
     padding: 4rem 0;
     border-top: 1px solid var(--line);
@@ -207,7 +207,6 @@ h1, .brand {
     color: var(--ink);
 }
 
-/* Responsive CSS Grid for Cards */
 .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -230,7 +229,7 @@ h1, .brand {
     box-shadow: 4px 4px 0px var(--accent);
 }
 
-.skill-card h3 {
+.skill-card h2 {
     font-family: "Space Grotesk", -apple-system, sans-serif;
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
@@ -240,7 +239,21 @@ h1, .brand {
 .skill-desc {
     color: var(--text-muted);
     font-size: 0.9rem;
-    margin-bottom: 0;
+    margin-bottom: 0.75rem;
+}
+
+.skill-tag {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent-dark);
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.25rem 0.6rem;
 }
 
 .experience-section {
