@@ -13,8 +13,10 @@
     <header class="site-header">
         <div class="container">
             <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <nav>
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_skills' %}">Skills</a>
             </nav>
         </div>
     </header>
@@ -28,7 +30,7 @@
                 </div>
                 <div class="hero-photo">
                     <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/kusuma.jpeg" alt="Photo of {{ Kusuma }}">
+                    <img class="avatar" src="/static/img/kusuma.jpeg" alt="Photo of {{ name }}">
                 </div>
                 <div class="hero-details">
                     <p class="bio">Computer Science student at Universitas Indonesia (Batch 2025) doing my best to survive here.</p>
@@ -47,30 +49,6 @@
                         <a href="https://linkedin.com/" class="social-link">https://www.linkedin.com/in/kusuma-putra-a-adhimaya-7045ba309/</a>
                         <a href="mailto:kusuma@example.com" class="social-link">kusumaputra2007@gmail.com</a>
                     </div>
-                </div>
-            </div>
-        </section>
-        <section class="skills-section" id="skills">
-            <div class="container">
-                <h2 class="section-title">Skills & Capabilities</h2>
-                <div class="skills-grid">
-    
-                    <article class="skill-card">
-                        <h3>Coding & Software Development</h3>
-                        <p class="skill-desc">Proficient in object-oriented programming with Java and Python, built through computer science coursework and software projects.</p>
-                    </article>
-
-                    <article class="skill-card">
-                        <h3>Video Editing & Motion Graphics</h3>
-                        <p class="skill-desc">Experienced in motion design using tools like Alight Motion and After Effects, self-taught since a young age through practice and motion graphics tutorials.</p>
-                    </article>
-
-                    <article class="skill-card">
-                        <h3>Hardware Repair & Maintenance</h3>
-                        <p class="skill-desc">Practical experience in disassembling mobile devices, performing component replacements (LCD screens, batteries), and hardware troubleshooting.</p>
-                        <div class="tech-tags">
-                    </article>
-
                 </div>
             </div>
         </section>

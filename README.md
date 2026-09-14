@@ -14,3 +14,10 @@ Class : PBP D
 
 #### Pernyataan Penggunaan AI
 Dalam pengerjaan Tugas 1 PBP, AI (Gemini) digunakan sebagai bantuan untuk struktur HTML5/CSS Grid. Seluruh kode dipelajari dan diimplementasikan secara mandiri.
+
+### Tugas 2
+1. Permintaan dari browser diterima oleh `urls.py` di level proyek, lalu diteruskan ke `urls.py` di aplikasi `main` untuk dicocokkan dengan path `skills/`. Path ini terhubung ke view `show_skills`, yang mengambil semua data `Skill` dari database lewat model, memasukkannya ke context, lalu mengirimkannya ke template `skills.html` untuk dirender menjadi HTML dan ditampilkan di browser.
+
+2. Karena data yang disimpan di model bisa diubah lewat shell tanpa mengedit kode HTML, sehingga lebih mudah ditambah, diubah, atau dihapus, dan tidak rawan salah ketik.
+
+3. `makemigrations` membuat berkas migrasi berdasarkan perubahan di `models.py`, sedangkan `migrate` menerapkan perubahan itu ke database. Contohnya saat saya menambahkan model `Skill`, saya menjalankan `makemigrations` untuk membuat berkas migrasinya, lalu `migrate` agar tabelnya benar-benar dibuat di database.
