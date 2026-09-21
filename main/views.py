@@ -1,3 +1,5 @@
+from itertools import groupby
+
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -27,20 +29,30 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_skills(request):
-    json_response = get_skills_json(request)
-
-    skills = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    skills = [skill.object for skill in skills]
     title_query = request.GET.get("title", "").strip()
+
+    skills = Skill.objects.all().order_by("category", "title")
+
+    if title_query:
+        skills = skills.filter(title__icontains=title_query)
+
+    grouped_skills = []
+
+    for category, category_skills in groupby(
+        skills,
+        key=lambda skill: skill.category or "Uncategorized"
+    ):
+        grouped_skills.append({
+            "category": category,
+            "skills": list(category_skills),
+        })
 
     context = {
         "name": "Kusuma Putra Abdillah Adhimaya",
-        "skills_list": skills,
+        "skills_list": grouped_skills,
         "title_query": title_query,
     }
+
     return render(request, "skills.html", context)
 
 def create_skill(request):

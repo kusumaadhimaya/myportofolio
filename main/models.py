@@ -29,7 +29,12 @@ class Skill(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    tags = models.CharField(max_length=255, blank=True, null=True)
+    category = models.CharField(max_length=255, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.category:
+            self.category = " ".join(self.category.split()).title()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

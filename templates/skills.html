@@ -8,12 +8,14 @@
     <main>
         <section class="skills-section" id="skills">
             <div class="container">
+
                 <div class="skills-header">
                     <h1 class="section-title">Skills</h1>
                     <a href="{% url 'main:create_skill' %}" class="button skills-add-button">
                         Tambah Skill
                     </a>
                 </div>
+
                 <form method="get"
                       action="{% url 'main:show_skills' %}"
                       class="skill-search">
@@ -25,28 +27,41 @@
                            aria-label="Cari berdasarkan nama skill">
                     <button type="submit" class="button">Cari</button>
                 </form>
-                <div class="skills-grid">
-                {% for skill in skills_list %}
-                <article class="skill-card">
-                    <h2>{{ skill.title }}</h2>
-                    <p class="skill-desc">
-                        {{ skill.description }}
-                    </p>
-                    {% if skill.tags %}
-                    <span class="skill-tag">
-                        {{ skill.tags }}
-                    </span>
-                    {% endif %}
-                    {% include "components/skill_delete_modal.html" with skill=skill %}
-                </article>
-                {% empty %}
-                    {% if title_query %}
-                        <p class="empty-state">Tidak ada skill dengan nama tersebut.</p>
-                    {% else %}
-                        <p class="empty-state">Belum ada skill yang ditambahkan.</p>
-                    {% endif %}
-                {% endfor %}
+
+                <div class="skill-categories">
+                    {% for category_group in skills_list %}
+                        <section class="skill-category">
+                            <h2 class="skill-category-title">
+                                {{ category_group.category }}
+                            </h2>
+
+                            <div class="skills-grid">
+                                {% for skill in category_group.skills %}
+                                    <article class="skill-card">
+                                        <h3>{{ skill.title }}</h3>
+
+                                        <p class="skill-desc">
+                                            {{ skill.description }}
+                                        </p>
+
+                                        {% include "components/skill_delete_modal.html" with skill=skill %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </section>
+                    {% empty %}
+                        {% if title_query %}
+                            <p class="empty-state">
+                                Tidak ada skill dengan nama tersebut.
+                            </p>
+                        {% else %}
+                            <p class="empty-state">
+                                Belum ada skill yang ditambahkan.
+                            </p>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+
             </div>
         </section>
     </main>

@@ -5,16 +5,16 @@ from main.models import Skill
 class SkillForm(ModelForm):
     class Meta:
         model = Skill
-        fields = ["title", "description", "tags"]
+        fields = ["title", "description", "category"]
         labels = {
             "title": "Nama Skill",
             "description": "Deskripsi Skill",
-            "tags": "Tags / Kategori",
+            "category": "Kategori",
         }
         widgets = {
             "title": TextInput(
                 attrs={
-                    "placeholder": "misal: Web Development",
+                    "placeholder": "misal: Python",
                     "maxlength": 255,
                 }
             ),
@@ -24,9 +24,9 @@ class SkillForm(ModelForm):
                     "rows": 3,
                 }
             ),
-            "tags": TextInput(
+            "category": TextInput(
                 attrs={
-                    "placeholder": "misal: Django, Python, HTML, CSS",
+                    "placeholder": "misal: Coding",
                     "maxlength": 255,
                 }
             ),

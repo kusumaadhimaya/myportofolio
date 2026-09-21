@@ -213,8 +213,23 @@ h1, .brand {
     gap: 1.5rem;
 }
 
+.skill-category {
+    margin: 0;
+}
+
+.skill-category + .skill-category {
+    margin-top: 2rem;
+}
+
+.skill-category-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+}
+
 .skills-add-button {
-    margin-bottom: 1.5rem;
+    margin: 0;
 }
 
 .skill-card {
@@ -233,7 +248,7 @@ h1, .brand {
     box-shadow: 4px 4px 0px var(--accent);
 }
 
-.skill-card h2 {
+.skill-card h3 {
     font-family: "Space Grotesk", -apple-system, sans-serif;
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
@@ -244,20 +259,6 @@ h1, .brand {
     color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 0.75rem;
-}
-
-.skill-tag {
-    display: inline-block;
-    align-self: flex-start;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--accent-dark);
-    background-color: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 0.25rem 0.6rem;
 }
 
 .experience-section {
