@@ -32,4 +32,4 @@ Dalam pengerjaan Tugas 1 PBP, AI (Gemini) digunakan sebagai bantuan untuk strukt
 
 ### AI Disclosure
 
-I used AI as a guide to help me implement the features I wanted and to better understand the code and concepts involved.
+I used AI (ChatGPT) as a guide to help me implement the features I wanted and to better understand the code and concepts involved.
