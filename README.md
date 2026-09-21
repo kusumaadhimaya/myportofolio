@@ -21,3 +21,15 @@ Dalam pengerjaan Tugas 1 PBP, AI (Gemini) digunakan sebagai bantuan untuk strukt
 2. Karena data yang disimpan di model bisa diubah lewat shell tanpa mengedit kode HTML, sehingga lebih mudah ditambah, diubah, atau dihapus, dan tidak rawan salah ketik.
 
 3. `makemigrations` membuat berkas migrasi berdasarkan perubahan di `models.py`, sedangkan `migrate` menerapkan perubahan itu ke database. Contohnya saat saya menambahkan model `Skill`, saya menjalankan `makemigrations` untuk membuat berkas migrasinya, lalu `migrate` agar tabelnya benar-benar dibuat di database.
+
+### Tugas 3
+
+1. `ModelForm` mempermudah pembuatan form berdasarkan model Django tanpa harus membuat setiap field secara manual. `{% csrf_token %}` digunakan untuk mencegah serangan CSRF pada request `POST`.
+
+2. JSON lebih disukai karena sintaksnya lebih sederhana, ringan, mudah dibaca, dan mudah diproses oleh aplikasi web dibandingkan XML.
+
+3. Serialization diperlukan untuk mengubah data model Django menjadi format yang dapat dikirim melalui response JSON dan diproses oleh client.
+
+### AI Disclosure
+
+I used AI as a guide to help me implement the features I wanted and to better understand the code and concepts involved.
