@@ -213,8 +213,23 @@ h1, .brand {
     gap: 1.5rem;
 }
 
+.skill-category {
+    margin: 0;
+}
+
+.skill-category + .skill-category {
+    margin-top: 2rem;
+}
+
+.skill-category-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+}
+
 .skills-add-button {
-    margin-bottom: 1.5rem;
+    margin: 0;
 }
 
 .skill-card {
@@ -233,7 +248,7 @@ h1, .brand {
     box-shadow: 4px 4px 0px var(--accent);
 }
 
-.skill-card h2 {
+.skill-card h3 {
     font-family: "Space Grotesk", -apple-system, sans-serif;
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
@@ -244,20 +259,6 @@ h1, .brand {
     color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 0.75rem;
-}
-
-.skill-tag {
-    display: inline-block;
-    align-self: flex-start;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--accent-dark);
-    background-color: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 0.25rem 0.6rem;
 }
 
 .experience-section {
@@ -479,4 +480,125 @@ h1, .brand {
     justify-content: flex-end;
     gap: 0.75rem;
     margin-top: 1.5rem;
+}
+
+.experience-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.experience-add-button {
+    margin-bottom: 0;
+}
+
+.experience-search {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.experience-search__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font: inherit;
+    color: var(--ink);
+    background: #fff;
+}
+
+.experience-search__input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.experience-card {
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.experience-category {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.experience-card h2 {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.experience-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.experience-status {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.experience-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.experience-thumbnail {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 700px) {
+    .experience-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .experience-search {
+        flex-direction: column;
+    }
+
+    .experience-search .button {
+        width: 100%;
+    }
+}
+
+.experience-dates {
+    margin-bottom: 1rem;
+}
+
+.experience-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.experience-date strong {
+    color: var(--ink);
 }
