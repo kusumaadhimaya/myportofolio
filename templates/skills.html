@@ -11,9 +11,11 @@
 
                 <div class="skills-header">
                     <h1 class="section-title">Skills</h1>
-                    <a href="{% url 'main:create_skill' %}" class="button skills-add-button">
-                        Tambah Skill
-                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'main:create_skill' %}" class="button skills-add-button">
+                            Tambah Skill
+                        </a>
+                    {% endif %}
                 </div>
 
                 <form method="get"
@@ -44,7 +46,25 @@
                                             {{ skill.description }}
                                         </p>
 
-                                        {% include "components/skill_delete_modal.html" with skill=skill %}
+                                        <p>
+                                            ⭐ {{ skill.starred_by.count }}
+                                        </p>
+
+                                        {% if user.is_authenticated %}
+                                            <form method="POST" action="{% url 'main:toggle_skill_star' skill.id %}">
+                                                {% csrf_token %}
+
+                                                <button type="submit" class="button">
+                                                    {% if user in skill.starred_by.all %}
+                                                        Unstar
+                                                    {% else %}
+                                                        Star
+                                                    {% endif %}
+                                                </button>
+                                            </form>
+
+                                            {% include "components/skill_delete_modal.html" with skill=skill %}
+                                        {% endif %}
                                     </article>
                                 {% endfor %}
                             </div>

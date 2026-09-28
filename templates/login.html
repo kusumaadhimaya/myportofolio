@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block meta %}
+    <title>Login - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+    <main>
+        <section class="experience-section">
+            <div class="container">
+                <h1 class="section-title">Login</h1>
+
+                <form method="post" class="skill-form">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <p class="form-error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    {% if form.non_field_errors %}
+                        {% for error in form.non_field_errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <button type="submit" class="button">
+                        Login
+                    </button>
+
+                    <a href="{% url 'main:register' %}"
+                       class="button button-secondary">
+                        Register
+                    </a>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

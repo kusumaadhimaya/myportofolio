@@ -11,6 +11,10 @@ from main.views import (
     get_experiences_json,
     get_skills_json,
     delete_skill,
+    register,
+    login_user,
+    logout_user,
+    toggle_skill_star,
 )
 
 app_name = "main"
@@ -26,4 +30,8 @@ urlpatterns = [
     path("skills/add/", create_skill, name="create_skill"),
     path("api/skills/", get_skills_json, name="get_skills_json"),
     path("skills/<uuid:skill_id>/delete/", delete_skill, name="delete_skill"),
+    path("register/", register, name="register"),
+    path("login/", login_user, name="login"),
+    path("logout/", logout_user, name="logout"),
+    path("skills/<uuid:skill_id>/star/", toggle_skill_star, name="toggle_skill_star"),
 ]
