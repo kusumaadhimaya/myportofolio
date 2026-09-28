@@ -65,6 +65,8 @@ WHITENOISE_USE_FINDERS = True
 
 ROOT_URLCONF = 'portofolio.urls'
 
+LOGIN_URL = "/login/"
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -11,9 +11,11 @@
 
             <div class="experience-header">
                 <h1 class="section-title">Experience</h1>
-                <a href="{% url 'main:create_experience' %}" class="button experience-add-button">
-                    Tambah Experience
-                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'main:create_experience' %}" class="button experience-add-button">
+                        Tambah Experience
+                    </a>
+                {% endif %}
             </div>
 
             <form method="get"
@@ -65,7 +67,7 @@
                                 </p>
                             {% endif %}
                         </div>
-
+                    {% if user.is_authenticated %}
                         <div class="experience-actions">
                             <a href="{% url 'main:update_experience' experience.id %}"
                             class="button">
@@ -74,7 +76,7 @@
 
                             {% include "components/experience_delete_modal.html" with experience=experience %}
                         </div>
-
+                    {% endif %}
                     </article>
 
                 {% empty %}

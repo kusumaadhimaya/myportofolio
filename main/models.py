@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
@@ -31,6 +32,11 @@ class Skill(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     category = models.CharField(max_length=255, blank=True, null=True)
+    starred_by = models.ManyToManyField(
+        User,
+        related_name="starred_skills",
+        blank=True,
+    )
 
     def save(self, *args, **kwargs):
         if self.category:
