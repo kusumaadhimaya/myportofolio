@@ -379,3 +379,178 @@ class AuthenticationTest(TestCase):
         self.assertTrue(
             Skill.objects.filter(id=skill.id).exists()
         )
+
+    def test_regular_user_cannot_update_experience(self):
+        user = User.objects.create_user(
+            username="testuser",
+            password="TestPassword123!",
+        )
+
+        self.client.login(
+            username="testuser",
+            password="TestPassword123!",
+        )
+
+        experience = Experience.objects.create(
+            title="Test Experience",
+            description="Test description",
+            category="part-time",
+            started_at="2026-01-01",
+        )
+
+        response = self.client.get(
+            reverse(
+                "main:update_experience",
+                args=[experience.id],
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_regular_user_cannot_delete_experience(self):
+        user = User.objects.create_user(
+            username="testuser",
+            password="TestPassword123!",
+        )
+
+        self.client.login(
+            username="testuser",
+            password="TestPassword123!",
+        )
+
+        experience = Experience.objects.create(
+            title="Test Experience",
+            description="Test description",
+            category="part-time",
+            started_at="2026-01-01",
+        )
+
+        response = self.client.post(
+            reverse(
+                "main:delete_experience",
+                args=[experience.id],
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_editor_can_update_experience(self):
+        user = User.objects.create_user(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        user.groups.create(name="Editor")
+
+        self.client.login(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        experience = Experience.objects.create(
+            title="Test Experience",
+            description="Test description",
+            category="part-time",
+            started_at="2026-01-01",
+        )
+
+        response = self.client.get(
+            reverse(
+                "main:update_experience",
+                args=[experience.id],
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_experience.html")
+
+    def test_editor_cannot_create_experience(self):
+        user = User.objects.create_user(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        user.groups.create(name="Editor")
+
+        self.client.login(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        response = self.client.get(
+            reverse("main:create_experience")
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_editor_cannot_delete_experience(self):
+        user = User.objects.create_user(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        user.groups.create(name="Editor")
+
+        self.client.login(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        experience = Experience.objects.create(
+            title="Test Experience",
+            description="Test description",
+            category="part-time",
+            started_at="2026-01-01",
+        )
+
+        response = self.client.post(
+            reverse(
+                "main:delete_experience",
+                args=[experience.id],
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.assertTrue(
+            Experience.objects.filter(
+                id=experience.id
+            ).exists()
+        )
+
+    def test_editor_can_star_skill(self):
+        user = User.objects.create_user(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        user.groups.create(name="Editor")
+
+        skill = Skill.objects.create(
+            title="Django",
+            description="Django development",
+            category="Python",
+        )
+
+        self.client.login(
+            username="editor",
+            password="EditorPassword123!",
+        )
+
+        response = self.client.post(
+            reverse(
+                "main:toggle_skill_star",
+                args=[skill.id],
+            )
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("main:show_skills"),
+        )
+
+        self.assertTrue(
+            skill.starred_by.filter(
+                id=user.id
+            ).exists()
+        )

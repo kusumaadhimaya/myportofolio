@@ -13,6 +13,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from main.models import Experience, Skill
 from main.forms import ExperienceForm, SkillForm
 
+def is_editor(user):
+    return user.groups.filter(name="Editor").exists()
+
 def show_main(request):
     last_login = request.COOKIES.get(
         "last_login",
@@ -54,6 +57,7 @@ def show_experience(request):
         "name": "Kusuma Putra Abdillah Adhimaya",
         "experience_list": experiences,
         "title_query": title_query,
+        "is_editor": is_editor(request.user),
     }
     return render(request, "experience.html", context)
 
@@ -78,7 +82,7 @@ def create_experience(request):
 
 @login_required
 def update_experience(request, experience_id):
-    if not request.user.is_superuser:
+    if not (request.user.is_superuser or is_editor(request.user)):
         raise PermissionDenied
     
     experience = get_object_or_404(Experience, pk=experience_id)
