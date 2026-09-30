@@ -1,6 +1,7 @@
 from django.urls import path
 
 from main.views import (
+    create_experience_ajax,
     show_main,
     show_experience,
     show_skills,
@@ -34,4 +35,5 @@ urlpatterns = [
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout"),
     path("skills/<uuid:skill_id>/star/", toggle_skill_star, name="toggle_skill_star"),
+    path("api/experiences/create/", create_experience_ajax, name="create_experience_ajax"),
 ]

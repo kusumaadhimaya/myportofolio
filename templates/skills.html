@@ -51,21 +51,23 @@
                                         </p>
 
                                         {% if user.is_authenticated %}
-                                            <form method="POST" action="{% url 'main:toggle_skill_star' skill.id %}">
-                                                {% csrf_token %}
+                                            <div class="skill-actions">
+                                                <form method="POST" action="{% url 'main:toggle_skill_star' skill.id %}">
+                                                    {% csrf_token %}
 
-                                                <button type="submit" class="button">
-                                                    {% if user in skill.starred_by.all %}
-                                                        Unstar
-                                                    {% else %}
-                                                        Star
-                                                    {% endif %}
-                                                </button>
-                                            </form>
+                                                    <button type="submit" class="button">
+                                                        {% if user in skill.starred_by.all %}
+                                                            Unstar
+                                                        {% else %}
+                                                            Star
+                                                        {% endif %}
+                                                    </button>
+                                                </form>
 
-                                            {% if user.is_superuser %}
-                                                {% include "components/skill_delete_modal.html" with skill=skill %}
-                                            {% endif %}
+                                                {% if user.is_superuser %}
+                                                    {% include "components/skill_delete_modal.html" with skill=skill %}
+                                                {% endif %}
+                                            </div>
                                         {% endif %}
                                     </article>
                                 {% endfor %}

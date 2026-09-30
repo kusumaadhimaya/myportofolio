@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from main.models import Experience, Skill
 from main.forms import ExperienceForm, SkillForm
@@ -39,24 +40,10 @@ def show_main(request):
 def show_experience(request):
     title_query = request.GET.get("title", "").strip()
 
-    json_response = get_experiences_json(request)
-    experiences = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8")
-    )
-    experiences = [experience.object for experience in experiences]
-
-    if title_query:
-        experiences = [
-            experience
-            for experience in experiences
-            if title_query.lower() in experience.title.lower()
-        ]
-
     context = {
         "name": "Kusuma Putra Abdillah Adhimaya",
-        "experience_list": experiences,
         "title_query": title_query,
+        "form": ExperienceForm(),
         "is_editor": is_editor(request.user),
     }
     return render(request, "experience.html", context)
@@ -116,9 +103,59 @@ def delete_experience(request, experience_id):
     return redirect("main:show_experience")
 
 def get_experiences_json(request):
+    title_query = request.GET.get("title", "").strip()
     experiences = Experience.objects.all()
-    experiences_json = serializers.serialize("json", experiences)
-    return HttpResponse(experiences_json, content_type="application/json")
+
+    if title_query:
+        experiences = experiences.filter(title__icontains=title_query)
+
+    data = []
+
+    for experience in experiences:
+        data.append({
+            "pk": str(experience.id),
+            "fields": {
+                "title": experience.title,
+                "description": experience.description,
+                "category": experience.get_category_display(),
+                "thumbnail": experience.thumbnail,
+                "started_at": experience.started_at.strftime("%d %b %Y"),
+                "ended_at": (
+                    experience.ended_at.strftime("%d %b %Y")
+                    if experience.ended_at
+                    else None
+                ),
+                "is_ongoing": experience.is_ongoing,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
+
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan experience."},
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+
+    if form.is_valid():
+        experience = form.save()
+
+        return JsonResponse(
+            {
+                "message": "Experience berhasil ditambahkan.",
+                "pk": str(experience.id),
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
+    )
 
 def show_skills(request):
     title_query = request.GET.get("title", "").strip()
