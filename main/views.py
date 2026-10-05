@@ -5,9 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.core import serializers
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -180,6 +179,7 @@ def show_skills(request):
         "name": "Kusuma Putra Abdillah Adhimaya",
         "skills_list": grouped_skills,
         "title_query": title_query,
+        "form": SkillForm(),
     }
 
     return render(request, "skills.html", context)
@@ -205,17 +205,55 @@ def create_skill(request):
 
 def get_skills_json(request):
     title_query = request.GET.get("title", "").strip()
-    skills = Skill.objects.all()
+    skills = Skill.objects.all().order_by("category", "title")
 
     if title_query:
         skills = skills.filter(title__icontains=title_query)
 
-    skills_json = serializers.serialize(
-        "json",
-        skills,
-        use_natural_foreign_keys=True,
+    data = []
+
+    for skill in skills:
+        data.append({
+            "pk": str(skill.id),
+            "fields": {
+                "title": skill.title,
+                "description": skill.description,
+                "category": skill.category or "Uncategorized",
+                "star_count": skill.starred_by.count(),
+                "is_starred": (
+                    request.user.is_authenticated
+                    and skill.starred_by.filter(id=request.user.id).exists()
+                ),
+            },
+        })
+
+    return JsonResponse(data, safe=False)
+
+@require_POST
+def create_skill_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan skill."},
+            status=403,
+        )
+
+    form = SkillForm(request.POST)
+
+    if form.is_valid():
+        skill = form.save()
+
+        return JsonResponse(
+            {
+                "message": "Skill berhasil ditambahkan.",
+                "pk": str(skill.id),
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
     )
-    return HttpResponse(skills_json, content_type="application/json")
 
 @login_required
 def delete_skill(request, skill_id):
