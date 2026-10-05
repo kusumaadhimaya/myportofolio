@@ -2,6 +2,7 @@ from django.urls import path
 
 from main.views import (
     create_experience_ajax,
+    create_skill_ajax,
     show_main,
     show_experience,
     show_skills,
@@ -30,6 +31,7 @@ urlpatterns = [
     path("skills/", show_skills, name="show_skills"),
     path("skills/add/", create_skill, name="create_skill"),
     path("api/skills/", get_skills_json, name="get_skills_json"),
+    path("api/skills/create/", create_skill_ajax, name="create_skill_ajax"),
     path("skills/<uuid:skill_id>/delete/", delete_skill, name="delete_skill"),
     path("register/", register, name="register"),
     path("login/", login_user, name="login"),

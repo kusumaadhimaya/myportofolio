@@ -34,6 +34,46 @@ class SkillForm(ModelForm):
             ),
         }
 
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama skill tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_category(self):
+        return strip_tags(self.cleaned_data["category"]).strip()
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
+    class Meta:
+        model = Skill
+        fields = ["title", "description", "category"]
+        labels = {
+            "title": "Nama Skill",
+            "description": "Deskripsi Skill",
+            "category": "Kategori",
+        }
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "misal: Python, Java, ...",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Jelaskan keahlian atau pengalaman kamu...",
+                    "rows": 3,
+                }
+            ),
+            "category": TextInput(
+                attrs={
+                    "placeholder": "misal: Coding, Video Editing, ...",
+                    "maxlength": 255,
+                }
+            ),
+        }
+
 
 class ExperienceForm(ModelForm):
     class Meta:

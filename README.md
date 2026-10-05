@@ -34,6 +34,18 @@ Dalam pengerjaan Tugas 1 PBP, AI (Gemini) digunakan sebagai bantuan untuk strukt
 
 I used AI (ChatGPT) as a guide to help me implement the features I wanted and to better understand the code and concepts involved.
 
-### AI Disclosure
+### AI Disclosure Tugas 4
 
 I used ChatGPT to guide me in implementing the required features and to help me understand the code and concepts.
+
+### Tugas 5
+
+1. Debouncing adalah teknik untuk menunda pengiriman request sampai pengguna berhenti melakukan suatu aksi selama waktu tertentu. Pada fitur pencarian AJAX, debouncing penting agar request tidak dikirim setiap kali pengguna mengetik satu karakter. Dengan begitu, jumlah request ke server berkurang dan pencarian menjadi lebih efisien.
+
+2. await digunakan untuk menunggu hingga fetch() selesai dan menghasilkan response sebelum kode berikutnya dijalankan. Jika tidak menggunakan await, fetch() langsung mengembalikan Promise, sehingga kode berikutnya dapat berjalan sebelum response dari server tersedia. Akibatnya, kita tidak dapat langsung menggunakan hasil response tersebut.
+
+3. XSS (Cross-Site Scripting) adalah serangan dengan memasukkan kode HTML atau JavaScript berbahaya ke dalam data. AJAX/JavaScript lebih berisiko kalau data langsung dimasukkan sebagai HTML, misalnya dengan innerHTML, karena kode tersebut bisa dijalankan oleh browser. Karena itu, data dari AJAX harus di-escape atau ditampilkan dengan cara yang aman seperti textContent.
+
+### AI Disclosure
+
+Saya menggunakan ChatGPT hanya untuk mengarahin saya cara mengimplementasikan fitur jika saya ada kesusahan dan untuk mengertikannya.
