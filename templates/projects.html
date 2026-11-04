@@ -8,9 +8,10 @@
 {% block content %}
 <main>
     <section class="projects-section" id="projects"
-             data-projects-endpoint="{% url 'main:get_projects_json' %}"
-             data-star-url-template="{% url 'main:toggle_project_star' '00000000-0000-0000-0000-000000000000' %}"
-             data-delete-url-template="{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}"
+             data-projects-endpoint="{% url 'api:project-list' %}"
+             data-detail-url-template="{% url 'api:project-detail' '00000000-0000-0000-0000-000000000000' %}"
+             data-star-url-template="{% url 'api:project-star' '00000000-0000-0000-0000-000000000000' %}"
+             data-login-url="{% url 'main:login' %}"
              data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
              data-superuser="{{ user.is_superuser|yesno:'true,false' }}">
         <div class="container">
@@ -47,7 +48,7 @@
         <button type="button" class="project-form-modal__close" popovertarget="add-project-modal"
                 popovertargetaction="hide" aria-label="Tutup form tambah project">×</button>
         <h2 id="add-project-modal-title">Tambah Project Baru</h2>
-        <form id="project-form" method="post" action="{% url 'main:create_project_ajax' %}" class="project-form">
+        <form id="project-form" method="post" action="{% url 'api:project-list' %}" class="project-form">
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
@@ -66,5 +67,6 @@
 </div>
 {% endif %}
 
+{% csrf_token %}
 <script src="{% static 'js/projects.js' %}" defer></script>
 {% endblock content %}
