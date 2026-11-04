@@ -11,10 +11,14 @@ def register(request):
         form.save()
         return redirect("main:login")
 
-    return render(request, "register.html", {
-        "name": "Kusuma Putra Abdillah Adhimaya",
-        "form": form,
-    })
+    return render(
+        request,
+        "register.html",
+        {
+            "name": "Kusuma Putra Abdillah Adhimaya",
+            "form": form,
+        },
+    )
 
 
 def login_user(request):
@@ -28,10 +32,14 @@ def login_user(request):
         )
         return response
 
-    return render(request, "login.html", {
-        "name": "Kusuma Putra Abdillah Adhimaya",
-        "form": form,
-    })
+    return render(
+        request,
+        "login.html",
+        {
+            "name": "Kusuma Putra Abdillah Adhimaya",
+            "form": form,
+        },
+    )
 
 
 def logout_user(request):
