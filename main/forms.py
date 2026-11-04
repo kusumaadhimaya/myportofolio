@@ -1,5 +1,5 @@
 from django.forms import DateInput, ModelForm, TextInput, Textarea
-from main.models import Experience, Skill
+from main.models import Experience, Project, Skill
 from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
 
@@ -124,3 +124,35 @@ class ExperienceForm(ModelForm):
 
     def clean_description(self):
         return strip_tags(self.cleaned_data["description"]).strip()
+
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ["title", "description", "tech_stack", "project_url", "project_image_url"]
+        labels = {
+            "title": "Nama Project",
+            "description": "Deskripsi",
+            "tech_stack": "Teknologi yang digunakan",
+            "project_url": "Link Project",
+            "project_image_url": "URL Gambar",
+        }
+        widgets = {
+            "title": TextInput(attrs={"placeholder": "misal: Aplikasi Jadwal", "maxlength": 255}),
+            "description": Textarea(attrs={"placeholder": "Ceritakan tentang project ini...", "rows": 4}),
+            "tech_stack": TextInput(attrs={"placeholder": "misal: Django, PostgreSQL", "maxlength": 255}),
+            "project_url": TextInput(attrs={"placeholder": "https://example.com/"}),
+            "project_image_url": TextInput(attrs={"placeholder": "https://example.com/image.jpg"}),
+        }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama project tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
+
+    def clean_tech_stack(self):
+        return strip_tags(self.cleaned_data["tech_stack"]).strip()
