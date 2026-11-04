@@ -5,6 +5,10 @@
 <title>Projects - {{ name }}</title>
 {% endblock meta %}
 
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock page_styles %}
+
 {% block content %}
 <main>
     <section class="projects-section collection-section" id="projects"

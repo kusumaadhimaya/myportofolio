@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block page_styles %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock page_styles %}
 {% block meta %}
     <title>{{ name }} - Portfolio</title>
 {% endblock meta %}

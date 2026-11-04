@@ -1,0 +1,61 @@
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.skill-category {
+    margin: 0;
+}
+
+.skill-category + .skill-category {
+    margin-top: 2rem;
+}
+
+.skill-category-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--ink);
+}
+
+.skill-card {
+    background-color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 4px 0 var(--accent);
+}
+
+.skill-card .button {
+    display: inline-block;
+    width: fit-content;
+    margin-right: 0.5rem;
+}
+
+.skill-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skill-card h3 {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+}
+
+.skill-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}

@@ -5,6 +5,10 @@
 <title>Skills - {{ name }}</title>
 {% endblock meta %}
 
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'css/skills.css' %}">
+{% endblock page_styles %}
+
 {% block content %}
 <main>
     <section class="skills-section collection-section" id="skills">
