@@ -80,22 +80,24 @@ def get_experiences_json(request):
 
     data = []
     for experience in experiences:
-        data.append({
-            "pk": str(experience.id),
-            "fields": {
-                "title": experience.title,
-                "description": experience.description,
-                "category": experience.get_category_display(),
-                "thumbnail": experience.thumbnail,
-                "started_at": experience.started_at.strftime("%d %b %Y"),
-                "ended_at": (
-                    experience.ended_at.strftime("%d %b %Y")
-                    if experience.ended_at
-                    else None
-                ),
-                "is_ongoing": experience.is_ongoing,
-            },
-        })
+        data.append(
+            {
+                "pk": str(experience.id),
+                "fields": {
+                    "title": experience.title,
+                    "description": experience.description,
+                    "category": experience.get_category_display(),
+                    "thumbnail": experience.thumbnail,
+                    "started_at": experience.started_at.strftime("%d %b %Y"),
+                    "ended_at": (
+                        experience.ended_at.strftime("%d %b %Y")
+                        if experience.ended_at
+                        else None
+                    ),
+                    "is_ongoing": experience.is_ongoing,
+                },
+            }
+        )
     return JsonResponse(data, safe=False)
 
 
