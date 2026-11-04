@@ -22,10 +22,12 @@ def show_skills(request):
         skills,
         key=lambda skill: skill.category or "Uncategorized",
     ):
-        grouped_skills.append({
-            "category": category,
-            "skills": list(category_skills),
-        })
+        grouped_skills.append(
+            {
+                "category": category,
+                "skills": list(category_skills),
+            }
+        )
 
     context = {
         "name": "Kusuma Putra Abdillah Adhimaya",
@@ -61,19 +63,21 @@ def get_skills_json(request):
 
     data = []
     for skill in skills:
-        data.append({
-            "pk": str(skill.id),
-            "fields": {
-                "title": skill.title,
-                "description": skill.description,
-                "category": skill.category or "Uncategorized",
-                "star_count": skill.starred_by.count(),
-                "is_starred": (
-                    request.user.is_authenticated
-                    and skill.starred_by.filter(id=request.user.id).exists()
-                ),
-            },
-        })
+        data.append(
+            {
+                "pk": str(skill.id),
+                "fields": {
+                    "title": skill.title,
+                    "description": skill.description,
+                    "category": skill.category or "Uncategorized",
+                    "star_count": skill.starred_by.count(),
+                    "is_starred": (
+                        request.user.is_authenticated
+                        and skill.starred_by.filter(id=request.user.id).exists()
+                    ),
+                },
+            }
+        )
     return JsonResponse(data, safe=False)
 
 
