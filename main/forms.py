@@ -1,7 +1,8 @@
-from django.forms import DateInput, ModelForm, TextInput, Textarea
-from main.models import Experience, Project, Skill
 from django.core.exceptions import ValidationError
+from django.forms import DateInput, ModelForm, TextInput, Textarea
 from django.utils.html import strip_tags
+
+from main.models import Experience, Project, Skill
 
 
 class SkillForm(ModelForm):
@@ -50,7 +51,14 @@ class SkillForm(ModelForm):
 class ExperienceForm(ModelForm):
     class Meta:
         model = Experience
-        fields = ["title", "description", "category", "thumbnail", "started_at", "ended_at"]
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "started_at",
+            "ended_at",
+        ]
         labels = {
             "title": "Judul",
             "description": "Deskripsi",
@@ -62,7 +70,10 @@ class ExperienceForm(ModelForm):
         widgets = {
             "title": TextInput(
                 attrs={
-                    "placeholder": "misal: Staff at Compfest, Intern in Ristek, Mentor at DDP-0, ...",
+                    "placeholder": (
+                        "misal: Staff at Compfest, Intern in Ristek, "
+                        "Mentor at DDP-0, ..."
+                    ),
                     "maxlength": 255,
                 }
             ),
@@ -77,12 +88,8 @@ class ExperienceForm(ModelForm):
                     "placeholder": "https://example.com/image.jpg",
                 }
             ),
-            "started_at": DateInput(
-                attrs={"type": "date"}
-            ),
-            "ended_at": DateInput(
-                attrs={"type": "date"}
-            ),
+            "started_at": DateInput(attrs={"type": "date"}),
+            "ended_at": DateInput(attrs={"type": "date"}),
         }
 
     def clean_title(self):
@@ -101,7 +108,13 @@ class ExperienceForm(ModelForm):
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        fields = ["title", "description", "tech_stack", "project_url", "project_image_url"]
+        fields = [
+            "title",
+            "description",
+            "tech_stack",
+            "project_url",
+            "project_image_url",
+        ]
         labels = {
             "title": "Nama Project",
             "description": "Deskripsi",
@@ -110,11 +123,30 @@ class ProjectForm(ModelForm):
             "project_image_url": "URL Gambar",
         }
         widgets = {
-            "title": TextInput(attrs={"placeholder": "misal: Aplikasi Jadwal", "maxlength": 255}),
-            "description": Textarea(attrs={"placeholder": "Ceritakan tentang project ini...", "rows": 4}),
-            "tech_stack": TextInput(attrs={"placeholder": "misal: Django, PostgreSQL", "maxlength": 255}),
-            "project_url": TextInput(attrs={"placeholder": "https://example.com/"}),
-            "project_image_url": TextInput(attrs={"placeholder": "https://example.com/image.jpg"}),
+            "title": TextInput(
+                attrs={
+                    "placeholder": "misal: Aplikasi Jadwal",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Ceritakan tentang project ini...",
+                    "rows": 4,
+                }
+            ),
+            "tech_stack": TextInput(
+                attrs={
+                    "placeholder": "misal: Django, PostgreSQL",
+                    "maxlength": 255,
+                }
+            ),
+            "project_url": TextInput(
+                attrs={"placeholder": "https://example.com/"}
+            ),
+            "project_image_url": TextInput(
+                attrs={"placeholder": "https://example.com/image.jpg"}
+            ),
         }
 
     def clean_title(self):
