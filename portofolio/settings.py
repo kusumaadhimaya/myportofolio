@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
-import os
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -25,15 +26,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9b(7(-nf^cb&y6096)d+s%x51=lf$d((pbp0dd&q#orj86l1ge'
+PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY')
+if PRODUCTION and not SECRET_KEY:
+    raise ImproperlyConfigured(
+        'Set the SECRET_KEY environment variable when PRODUCTION=True.'
+    )
+SECRET_KEY = SECRET_KEY or 'django-insecure-local-development-only'
+
+# DEBUG defaults on locally and is always disabled in production.
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true' and not PRODUCTION
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "kusuma-putra-myportofolio.pws.cs.ui.ac.id"]
-
-PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
 # Application definition
 
