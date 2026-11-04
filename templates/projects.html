@@ -7,7 +7,7 @@
 
 {% block content %}
 <main>
-    <section class="projects-section" id="projects"
+    <section class="projects-section collection-section" id="projects"
              data-projects-endpoint="{% url 'api:project-list' %}"
              data-detail-url-template="{% url 'api:project-detail' '00000000-0000-0000-0000-000000000000' %}"
              data-star-url-template="{% url 'api:project-star' '00000000-0000-0000-0000-000000000000' %}"
@@ -15,7 +15,7 @@
              data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
              data-superuser="{{ user.is_superuser|yesno:'true,false' }}">
         <div class="container">
-            <div class="projects-header">
+            <div class="collection-header">
                 <h1 class="section-title">Projects</h1>
                 {% if user.is_superuser %}
                     <button type="button" class="button" popovertarget="add-project-modal">
@@ -24,10 +24,10 @@
                 {% endif %}
             </div>
 
-            <form id="project-search-form" class="experience-search">
+            <form id="project-search-form" class="collection-search">
                 <input type="search" id="project-search-input" name="title"
                        value="{{ title_query }}" placeholder="Cari berdasarkan nama project"
-                       class="experience-search__input" aria-label="Cari project">
+                       class="collection-search__input" aria-label="Cari project">
                 <button type="submit" class="button">Cari</button>
             </form>
 

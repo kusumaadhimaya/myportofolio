@@ -2,129 +2,129 @@
 {% load static %}
 
 {% block meta %}
-    <title>Skills - {{ name }}</title>
+<title>Skills - {{ name }}</title>
 {% endblock meta %}
 
 {% block content %}
-    <main>
-        <section class="skills-section" id="skills">
-            <div class="container">
+<main>
+    <section class="skills-section collection-section" id="skills">
+        <div class="container">
 
-                <div class="skills-header">
-                    <h1 class="section-title">Skills</h1>
+            <div class="collection-header">
+                <h1 class="section-title">Skills</h1>
 
-                    {% if user.is_superuser %}
-                        <button type="button"
-                                class="button skills-add-button"
-                                popovertarget="add-skill-modal">
-                            Tambah Skill
-                        </button>
-                    {% endif %}
-                </div>
-
-                <form id="skill-search-form" class="skill-search">
-                    <input type="search"
-                           id="search-input"
-                           name="title"
-                           value="{{ title_query }}"
-                           placeholder="Cari berdasarkan nama skill"
-                           class="skill-search__input"
-                           aria-label="Cari berdasarkan nama skill">
-                    <button type="submit" class="button">Cari</button>
-                </form>
-
-                <div id="loading" class="empty-state hide">
-                    <p>Memuat skill...</p>
-                </div>
-
-                <div id="error" class="empty-state hide">
-                    <p>Gagal memuat data skill. Silakan coba lagi.</p>
-                </div>
-
-                <div id="empty" class="empty-state hide">
-                    <p>Belum ada skill yang ditambahkan atau ditemukan.</p>
-                </div>
-
-                <div id="skill-categories"
-                     class="skill-categories hide"
-                     data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
-                     data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
-                     data-skills-endpoint="{% url 'main:get_skills_json' %}"
-                     data-star-url-template="{% url 'main:toggle_skill_star' '00000000-0000-0000-0000-000000000000' %}"
-                     data-delete-url-template="{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}">
-                </div>
-
+                {% if user.is_superuser %}
+                    <button type="button"
+                            class="button"
+                            popovertarget="add-skill-modal">
+                        Tambah Skill
+                    </button>
+                {% endif %}
             </div>
-        </section>
-    </main>
 
-    {% if user.is_superuser %}
-        <div id="add-skill-modal"
-             class="project-form-modal"
-             popover="auto"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="add-skill-modal-title">
+            <form id="skill-search-form" class="collection-search">
+                <input type="search"
+                        id="search-input"
+                        name="title"
+                        value="{{ title_query }}"
+                        placeholder="Cari berdasarkan nama skill"
+                        class="collection-search__input"
+                        aria-label="Cari berdasarkan nama skill">
+                <button type="submit" class="button">Cari</button>
+            </form>
+
+            <div id="loading" class="empty-state hide">
+                <p>Memuat skill...</p>
+            </div>
+
+            <div id="error" class="empty-state hide">
+                <p>Gagal memuat data skill. Silakan coba lagi.</p>
+            </div>
+
+            <div id="empty" class="empty-state hide">
+                <p>Belum ada skill yang ditambahkan atau ditemukan.</p>
+            </div>
+
+            <div id="skill-categories"
+                    class="skill-categories hide"
+                    data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
+                    data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
+                    data-skills-endpoint="{% url 'main:get_skills_json' %}"
+                    data-star-url-template="{% url 'main:toggle_skill_star' '00000000-0000-0000-0000-000000000000' %}"
+                    data-delete-url-template="{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}">
+            </div>
+
+        </div>
+    </section>
+</main>
+
+{% if user.is_superuser %}
+    <div id="add-skill-modal"
+            class="project-form-modal"
+            popover="auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-skill-modal-title">
+
+        <button type="button"
+                class="project-form-modal__backdrop"
+                popovertarget="add-skill-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form tambah skill">
+        </button>
+
+        <div class="project-form-modal__content">
 
             <button type="button"
-                    class="project-form-modal__backdrop"
+                    class="project-form-modal__close"
                     popovertarget="add-skill-modal"
                     popovertargetaction="hide"
                     aria-label="Tutup form tambah skill">
+                ×
             </button>
 
-            <div class="project-form-modal__content">
+            <h2 id="add-skill-modal-title">Tambah Skill Baru</h2>
 
-                <button type="button"
-                        class="project-form-modal__close"
-                        popovertarget="add-skill-modal"
-                        popovertargetaction="hide"
-                        aria-label="Tutup form tambah skill">
-                    ×
-                </button>
+            <form id="skill-form"
+                    method="post"
+                    action="{% url 'main:create_skill_ajax' %}"
+                    class="skill-form">
 
-                <h2 id="add-skill-modal-title">Tambah Skill Baru</h2>
+                {% csrf_token %}
 
-                <form id="skill-form"
-                      method="post"
-                      action="{% url 'main:create_skill_ajax' %}"
-                      class="skill-form">
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
 
-                    {% csrf_token %}
+                        {{ field }}
 
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">
-                                {{ field.label }}
-                            </label>
-
-                            {{ field }}
-
-                            <div class="form-error"
-                                 id="{{ field.name }}-error">
-                            </div>
+                        <div class="form-error"
+                                id="{{ field.name }}-error">
                         </div>
-                    {% endfor %}
-
-                    <div class="project-form-modal__actions">
-
-                        <button type="button"
-                                class="button button-secondary"
-                                popovertarget="add-skill-modal"
-                                popovertargetaction="hide">
-                            Batal
-                        </button>
-
-                        <button type="submit" class="button">
-                            Tambah Skill
-                        </button>
-
                     </div>
-                </form>
+                {% endfor %}
 
-            </div>
+                <div class="project-form-modal__actions">
+
+                    <button type="button"
+                            class="button button-secondary"
+                            popovertarget="add-skill-modal"
+                            popovertargetaction="hide">
+                        Batal
+                    </button>
+
+                    <button type="submit" class="button">
+                        Tambah Skill
+                    </button>
+
+                </div>
+            </form>
+
         </div>
-    {% endif %}
+    </div>
+{% endif %}
 
 <script src="{% static 'js/skills.js' %}" defer></script>
 
