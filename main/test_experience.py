@@ -26,37 +26,43 @@ class ExperienceTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertContains(response, 'data-experiences-endpoint="/api/experiences/"')
         self.assertContains(
             response,
             f'href="{reverse("main:show_main")}"'
         )
+
+    def test_experience_json_shows_data(self):
+        response = self.client.get(reverse("main:get_experiences_json"))
+
+        self.assertEqual(response.status_code, 200)
+        fields = response.json()[0]["fields"]
+        self.assertEqual(fields["title"], self.experience.title)
+        self.assertEqual(fields["description"], self.experience.description)
+        self.assertEqual(fields["category"], "Part-Time")
+        self.assertTrue(fields["is_ongoing"])
 
     def test_experience_is_not_shown_on_main_page(self):
         response = self.client.get(reverse("main:show_main"))
 
         self.assertNotContains(response, self.experience.title)
 
-    def test_empty_experience_page(self):
+    def test_empty_experience_json(self):
         Experience.objects.all().delete()
-        response = self.client.get(reverse("main:show_experience"))
+        response = self.client.get(reverse("main:get_experiences_json"))
 
-        self.assertContains(
-            response,
-            "Belum ada pengalaman yang ditambahkan."
-        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
 
     def test_completed_experience(self):
         self.experience.ended_at = date(2026, 9, 28)
         self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
+        response = self.client.get(reverse("main:get_experiences_json"))
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+        fields = response.json()[0]["fields"]
+        self.assertEqual(fields["ended_at"], "28 Sep 2026")
+        self.assertFalse(fields["is_ongoing"])
 
     def test_create_experience_requires_login(self):
         response = self.client.get(

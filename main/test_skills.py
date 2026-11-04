@@ -19,17 +19,17 @@ class SkillTest(TestCase):
         self.assertTemplateUsed(response, "skills.html")
 
     def test_skills_page_shows_data(self):
-        response = self.client.get(reverse("main:show_skills"))
+        response = self.client.get(reverse("main:get_skills_json"))
 
-        self.assertContains(response, self.skill.title)
-        self.assertContains(response, self.skill.description)
-        self.assertContains(response, self.skill.category)
+        self.assertEqual(response.status_code, 200)
+        fields = response.json()[0]["fields"]
+        self.assertEqual(fields["title"], self.skill.title)
+        self.assertEqual(fields["description"], self.skill.description)
+        self.assertEqual(fields["category"], self.skill.category)
 
-    def test_empty_skills_page(self):
+    def test_empty_skills_json(self):
         Skill.objects.all().delete()
-        response = self.client.get(reverse("main:show_skills"))
+        response = self.client.get(reverse("main:get_skills_json"))
 
-        self.assertContains(
-            response,
-            "Belum ada skill yang ditambahkan."
-        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
