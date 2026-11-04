@@ -11,36 +11,42 @@ from main.models import Project
 
 def show_projects(request):
     title_query = request.GET.get("title", "").strip()
-    return render(request, "projects.html", {
+    context = {
         "name": "Kusuma Putra Abdillah Adhimaya",
         "title_query": title_query,
         "form": ProjectForm(),
-    })
+    }
+    return render(request, "projects.html", context)
 
 
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.prefetch_related("starred_by").order_by("title", "id")
+    projects = (
+        Project.objects.prefetch_related("starred_by")
+        .order_by("title", "id")
+    )
     if title_query:
         projects = projects.filter(title__icontains=title_query)
 
     data = []
     for project in projects:
-        data.append({
-            "pk": str(project.id),
-            "fields": {
-                "title": project.title,
-                "description": project.description,
-                "tech_stack": project.tech_stack,
-                "project_url": project.project_url,
-                "project_image_url": project.project_image_url,
-                "star_count": project.starred_by.count(),
-                "is_starred": (
-                    request.user.is_authenticated
-                    and project.starred_by.filter(id=request.user.id).exists()
-                ),
-            },
-        })
+        data.append(
+            {
+                "pk": str(project.id),
+                "fields": {
+                    "title": project.title,
+                    "description": project.description,
+                    "tech_stack": project.tech_stack,
+                    "project_url": project.project_url,
+                    "project_image_url": project.project_image_url,
+                    "star_count": project.starred_by.count(),
+                    "is_starred": (
+                        request.user.is_authenticated
+                        and project.starred_by.filter(id=request.user.id).exists()
+                    ),
+                },
+            }
+        )
     return JsonResponse(data, safe=False)
 
 
@@ -56,10 +62,16 @@ def create_project_ajax(request):
     if form.is_valid():
         project = form.save()
         return JsonResponse(
-            {"message": "Project berhasil ditambahkan.", "pk": str(project.id)},
+            {
+                "message": "Project berhasil ditambahkan.",
+                "pk": str(project.id),
+            },
             status=201,
         )
-    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
+    )
 
 
 @login_required
