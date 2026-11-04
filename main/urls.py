@@ -1,28 +1,30 @@
 from django.urls import path
 
-from main.views import (
+from main.auth_views import login_user, logout_user, register
+from main.experience_views import (
     create_experience_ajax,
-    create_skill_ajax,
-    show_main,
-    show_experience,
-    show_skills,
-    create_skill,
     create_experience,
-    update_experience,
     delete_experience,
     get_experiences_json,
-    get_skills_json,
-    delete_skill,
-    register,
-    login_user,
-    logout_user,
-    toggle_skill_star,
-    show_projects,
-    get_projects_json,
+    show_experience,
+    update_experience,
+)
+from main.project_views import (
     create_project_ajax,
     delete_project,
+    get_projects_json,
+    show_projects,
     toggle_project_star,
 )
+from main.skill_views import (
+    create_skill,
+    create_skill_ajax,
+    delete_skill,
+    get_skills_json,
+    show_skills,
+    toggle_skill_star,
+)
+from main.views import show_main
 
 app_name = "main"
 
