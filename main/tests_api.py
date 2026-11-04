@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import Project
+from main.models import Experience, Project
 
 
 class ProjectAPITest(APITestCase):
@@ -256,3 +256,145 @@ class ProjectAPITest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+
+class ExperienceAPIPermissionTest(APITestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(
+            username="experience-owner",
+            password="test-password",
+            email="experience-owner@example.com",
+        )
+        self.editor = User.objects.create_user(
+            username="experience-editor",
+            password="test-password",
+        )
+        self.editor.groups.create(name="Editor")
+        self.visitor = User.objects.create_user(
+            username="experience-visitor",
+            password="test-password",
+        )
+        self.experience = Experience.objects.create(
+            title="Teaching Assistant",
+            description="Supporting students.",
+            category="part-time",
+            started_at="2026-01-01",
+        )
+        self.list_url = reverse("api:experience-list")
+        self.detail_url = reverse(
+            "api:experience-detail",
+            args=[self.experience.id],
+        )
+        self.payload = {
+            "title": "Research Assistant",
+            "description": "Working on a research project.",
+            "category": "research",
+            "started_at": "2026-02-01",
+            "ended_at": "2026-10-01",
+            "thumbnail": "",
+        }
+
+    def test_experience_list_and_detail_are_public(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["id"], str(self.experience.id))
+        self.assertTrue(response.data[0]["is_ongoing"])
+        self.assertEqual(
+            self.client.get(self.detail_url).status_code,
+            status.HTTP_200_OK,
+        )
+
+    def test_editor_can_update_experience(self):
+        self.client.force_authenticate(user=self.editor)
+
+        response = self.client.patch(
+            self.detail_url,
+            {"title": "Updated Experience"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Updated Experience")
+
+    def test_regular_user_cannot_update_experience(self):
+        self.client.force_authenticate(user=self.visitor)
+
+        response = self.client.patch(
+            self.detail_url,
+            {"title": "Unauthorized Update"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Teaching Assistant")
+
+    def test_editor_cannot_create_or_delete_experience(self):
+        self.client.force_authenticate(user=self.editor)
+
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+        delete_response = self.client.delete(self.detail_url)
+
+        self.assertEqual(
+            create_response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            delete_response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(Experience.objects.count(), 1)
+
+    def test_owner_can_create_and_delete_experience(self):
+        self.client.force_authenticate(user=self.owner)
+
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+
+        self.assertEqual(
+            create_response.status_code,
+            status.HTTP_201_CREATED,
+        )
+        created_id = create_response.data["id"]
+        created_url = reverse("api:experience-detail", args=[created_id])
+
+        delete_response = self.client.delete(created_url)
+
+        self.assertEqual(
+            delete_response.status_code,
+            status.HTTP_204_NO_CONTENT,
+        )
+        self.assertEqual(delete_response.content, b"")
+        self.assertFalse(Experience.objects.filter(pk=created_id).exists())
+
+    def test_guest_cannot_write_experience(self):
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+        update_response = self.client.patch(
+            self.detail_url,
+            {"title": "Unauthorized Update"},
+            format="json",
+        )
+
+        self.assertEqual(
+            create_response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            update_response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(Experience.objects.count(), 1)

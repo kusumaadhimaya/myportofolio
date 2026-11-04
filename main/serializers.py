@@ -1,7 +1,40 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import Project
+from main.models import Experience, Project
+
+
+class ExperienceSerializer(serializers.ModelSerializer):
+    is_ongoing = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Experience
+        fields = [
+            "id",
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "started_at",
+            "ended_at",
+            "is_ongoing",
+        ]
+        read_only_fields = ["id", "is_ongoing"]
+
+    def validate_title(self, value):
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Title cannot be empty.")
+        return value
+
+    def validate_description(self, value):
+        return strip_tags(value).strip()
+
+    def validate_category(self, value):
+        return strip_tags(value).strip()
+
+    def get_is_ongoing(self, obj):
+        return obj.is_ongoing
 
 
 class ProjectSerializer(serializers.ModelSerializer):
