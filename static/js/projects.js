@@ -2,7 +2,6 @@ const projectPage = document.getElementById('projects');
 const projectsEndpoint = projectPage.dataset.projectsEndpoint;
 const detailUrlTemplate = projectPage.dataset.detailUrlTemplate;
 const starUrlTemplate = projectPage.dataset.starUrlTemplate;
-const loginUrl = projectPage.dataset.loginUrl;
 const isAuthenticated = projectPage.dataset.authenticated === 'true';
 const isSuperuser = projectPage.dataset.superuser === 'true';
 
@@ -139,12 +138,6 @@ function makeProjectCard(project) {
         starCount.setAttribute('aria-label', `${project.star_count} stars`);
         starCount.textContent = project.star_count;
         rightActions.appendChild(starCount);
-
-        const loginLink = document.createElement('a');
-        loginLink.className = 'button button-secondary';
-        loginLink.href = loginUrl;
-        loginLink.textContent = 'Login to star';
-        rightActions.appendChild(loginLink);
     }
 
     if (leftActions.childElementCount) actions.appendChild(leftActions);
