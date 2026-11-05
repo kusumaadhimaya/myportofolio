@@ -66,8 +66,10 @@
 
 {% if user.is_superuser %}
     {% include "components/skill_form_modal.html" %}
+    {% include "components/delete_confirmation_modal.html" %}
+    <script src="{% static 'js/delete_modal.js' %}?v=1" defer></script>
 {% endif %}
 
-<script src="{% static 'js/skills.js' %}?v=2" defer></script>
+<script src="{% static 'js/skills.js' %}?v=3" defer></script>
 
 {% endblock content %}

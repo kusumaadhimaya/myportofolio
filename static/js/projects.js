@@ -251,28 +251,43 @@ projectGrid.addEventListener('click', async event => {
         }
         return;
     }
-    if (
-        action === 'delete'
-        && !window.confirm('Yakin ingin menghapus project ini?')
-    ) {
+    if (action === 'delete') {
+        window.openDeleteConfirmation({
+            itemType: 'project',
+            itemName: button.dataset.projectTitle,
+            onConfirm: async () => {
+                button.disabled = true;
+                try {
+                    await writeProject(projectUrlFor(detailUrlTemplate, projectId), 'DELETE');
+                    showToast(
+                        'Berhasil',
+                        `"${button.dataset.projectTitle}" berhasil dihapus.`,
+                        'success',
+                    );
+                    await fetchProjects(projectSearch.value.trim());
+                    return true;
+                } catch (error) {
+                    showToast('Gagal', error.message, 'error');
+                    button.disabled = false;
+                    return false;
+                }
+            },
+        });
         return;
     }
 
-    const endpointTemplate = action === 'star'
-        ? starUrlTemplate
-        : detailUrlTemplate;
-    const method = action === 'star' ? 'POST' : 'DELETE';
     button.disabled = true;
 
     try {
-        const data = await writeProject(projectUrlFor(endpointTemplate, projectId), method);
+        const data = await writeProject(
+            projectUrlFor(starUrlTemplate, projectId),
+            'POST',
+        );
         showToast(
             'Berhasil',
-            action === 'star'
-                ? (data.is_starred
-                    ? `Anda memberi "${data.title}" star.`
-                    : 'Star dibatalkan.')
-                : `"${button.dataset.projectTitle}" berhasil dihapus.`,
+            data.is_starred
+                ? `Anda memberi "${data.title}" star.`
+                : 'Star dibatalkan.',
             'success',
         );
         await fetchProjects(projectSearch.value.trim());

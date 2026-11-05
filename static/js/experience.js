@@ -320,7 +320,29 @@ gridContainer.addEventListener('click', async event => {
         await openExperienceEditor(experienceId, button);
         return;
     }
-    if (action === 'delete' && !window.confirm('Yakin ingin menghapus experience ini?')) return;
+    if (action === 'delete') {
+        window.openDeleteConfirmation({
+            itemType: 'experience',
+            itemName: button.dataset.experienceTitle,
+            onConfirm: async () => {
+                button.disabled = true;
+                try {
+                    const endpoint = experienceUrlFor(detailUrlTemplate, experienceId);
+                    const data = await sendExperienceAction(endpoint, 'DELETE');
+                    const message = data.message
+                        || `"${button.dataset.experienceTitle}" berhasil dihapus.`;
+                    showToast('Berhasil', message, 'success');
+                    await fetchExperiences(searchInput.value.trim());
+                    return true;
+                } catch (error) {
+                    showToast('Gagal', error.message, 'error');
+                    button.disabled = false;
+                    return false;
+                }
+            },
+        });
+        return;
+    }
 
     button.disabled = true;
     try {

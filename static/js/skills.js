@@ -116,6 +116,7 @@ function buildSkillCardElement(skill) {
         deleteForm.method = 'POST';
         deleteForm.action = skillUrlFor(deleteUrlTemplate, skill.pk);
         deleteForm.dataset.action = 'delete';
+        deleteForm.dataset.skillTitle = fields.title;
         deleteForm.appendChild(createCsrfInput());
 
         const deleteButton = document.createElement('button');
@@ -137,8 +138,40 @@ categoriesContainer.addEventListener('submit', async event => {
     if (!form) return;
     event.preventDefault();
 
-    if (form.dataset.action === 'delete'
-        && !window.confirm('Apakah Anda yakin ingin menghapus skill ini?')) return;
+    if (form.dataset.action === 'delete') {
+        const deleteButton = form.querySelector('button[type="submit"]');
+        window.openDeleteConfirmation({
+            itemType: 'skill',
+            itemName: form.dataset.skillTitle,
+            onConfirm: async () => {
+                deleteButton.disabled = true;
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            Accept: 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Permintaan skill gagal.');
+                    }
+
+                    showToast('Berhasil', data.message, 'success');
+                    await fetchSkills(searchInput.value.trim());
+                    return true;
+                } catch (error) {
+                    showToast('Gagal', error.message, 'error');
+                    deleteButton.disabled = false;
+                    return false;
+                }
+            },
+        });
+        return;
+    }
 
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
