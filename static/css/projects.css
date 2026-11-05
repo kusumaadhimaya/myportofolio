@@ -50,18 +50,5 @@
 }
 
 .project-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
     margin-top: 0.5rem;
-}
-
-.project-actions form {
-    margin: 0;
-}
-
-.project-star-count {
-    color: var(--text-muted);
-    font-size: 0.9rem;
 }

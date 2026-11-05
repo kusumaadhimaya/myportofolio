@@ -64,14 +64,15 @@ function buildSkillCardElement(skill) {
     description.textContent = fields.description;
     article.appendChild(description);
 
-    const starCount = document.createElement('p');
-    starCount.textContent = `⭐ ${fields.star_count}`;
-    article.appendChild(starCount);
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+
+    const leftActions = document.createElement('div');
+    leftActions.className = 'card-actions__left';
+    const rightActions = document.createElement('div');
+    rightActions.className = 'card-actions__right';
 
     if (isAuthenticated) {
-        const actions = document.createElement('div');
-        actions.className = 'skill-actions';
-
         const starForm = document.createElement('form');
         starForm.method = 'POST';
         starForm.action = skillUrlFor(starUrlTemplate, skill.pk);
@@ -79,33 +80,46 @@ function buildSkillCardElement(skill) {
 
         const starButton = document.createElement('button');
         starButton.type = 'submit';
-        starButton.className = 'button';
-        starButton.textContent = fields.is_starred ? 'Unstar' : 'Star';
+        starButton.className = 'card-star-button';
+        starButton.setAttribute('aria-pressed', String(fields.is_starred));
+        starButton.setAttribute(
+            'aria-label',
+            `${fields.is_starred ? 'Remove star' : 'Add star'} (${fields.star_count} stars)`,
+        );
+        starButton.textContent = fields.star_count;
         starForm.appendChild(starButton);
-        actions.appendChild(starForm);
-
-        if (isSuperuser) {
-            const deleteForm = document.createElement('form');
-            deleteForm.method = 'POST';
-            deleteForm.action = skillUrlFor(deleteUrlTemplate, skill.pk);
-            deleteForm.appendChild(createCsrfInput());
-
-            const deleteButton = document.createElement('button');
-            deleteButton.type = 'submit';
-            deleteButton.className = 'button button-danger';
-            deleteButton.textContent = 'Hapus Skill';
-            deleteButton.addEventListener('click', event => {
-                if (!confirm('Apakah Anda yakin ingin menghapus skill ini?')) {
-                    event.preventDefault();
-                }
-            });
-            deleteForm.appendChild(deleteButton);
-            actions.appendChild(deleteForm);
-        }
-
-        article.appendChild(actions);
+        rightActions.appendChild(starForm);
+    } else {
+        const starCount = document.createElement('span');
+        starCount.className = 'star-count';
+        starCount.setAttribute('role', 'img');
+        starCount.setAttribute('aria-label', `${fields.star_count} stars`);
+        starCount.textContent = fields.star_count;
+        rightActions.appendChild(starCount);
     }
 
+    if (isSuperuser) {
+        const deleteForm = document.createElement('form');
+        deleteForm.method = 'POST';
+        deleteForm.action = skillUrlFor(deleteUrlTemplate, skill.pk);
+        deleteForm.appendChild(createCsrfInput());
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'submit';
+        deleteButton.className = 'button button-danger';
+        deleteButton.textContent = 'Hapus';
+        deleteButton.addEventListener('click', event => {
+            if (!confirm('Apakah Anda yakin ingin menghapus skill ini?')) {
+                event.preventDefault();
+            }
+        });
+        deleteForm.appendChild(deleteButton);
+        leftActions.appendChild(deleteForm);
+    }
+
+    if (leftActions.childElementCount) actions.appendChild(leftActions);
+    actions.appendChild(rightActions);
+    article.appendChild(actions);
     return article;
 }
 

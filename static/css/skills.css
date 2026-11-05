@@ -35,18 +35,6 @@
     box-shadow: 4px 4px 0 var(--accent);
 }
 
-.skill-card .button {
-    display: inline-block;
-    width: fit-content;
-    margin-right: 0.5rem;
-}
-
-.skill-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
 .skill-card h3 {
     font-family: "Space Grotesk", -apple-system, sans-serif;
     font-size: 1.25rem;

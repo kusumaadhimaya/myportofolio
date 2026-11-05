@@ -78,39 +78,11 @@ function makeProjectCard(project) {
     card.appendChild(stack);
 
     const actions = document.createElement('div');
-    actions.className = 'project-actions';
-    const projectUrl = safeProjectUrl(project.project_url);
-    if (projectUrl) {
-        const link = document.createElement('a');
-        link.className = 'button';
-        link.href = projectUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = 'Lihat Project';
-        actions.appendChild(link);
-    }
-
-    const starCount = document.createElement('span');
-    starCount.className = 'project-star-count';
-    starCount.textContent = `⭐ ${project.star_count}`;
-    actions.appendChild(starCount);
-
-    if (isAuthenticated) {
-        const starButton = document.createElement('button');
-        starButton.type = 'button';
-        starButton.className = 'button button-secondary';
-        starButton.dataset.action = 'star';
-        starButton.dataset.projectId = project.id;
-        starButton.title = project.starred_by_names || '';
-        starButton.textContent = project.is_starred ? 'Unstar' : 'Star';
-        actions.appendChild(starButton);
-    } else {
-        const loginLink = document.createElement('a');
-        loginLink.className = 'button button-secondary';
-        loginLink.href = loginUrl;
-        loginLink.textContent = 'Login to star';
-        actions.appendChild(loginLink);
-    }
+    actions.className = 'card-actions project-actions';
+    const leftActions = document.createElement('div');
+    leftActions.className = 'card-actions__left';
+    const rightActions = document.createElement('div');
+    rightActions.className = 'card-actions__right';
 
     if (isSuperuser) {
         const deleteButton = document.createElement('button');
@@ -119,9 +91,51 @@ function makeProjectCard(project) {
         deleteButton.dataset.action = 'delete';
         deleteButton.dataset.projectId = project.id;
         deleteButton.textContent = 'Hapus';
-        actions.appendChild(deleteButton);
+        leftActions.appendChild(deleteButton);
     }
 
+    const projectUrl = safeProjectUrl(project.project_url);
+    if (projectUrl) {
+        const link = document.createElement('a');
+        link.className = 'button';
+        link.href = projectUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'Lihat Project';
+        leftActions.appendChild(link);
+    }
+
+    if (isAuthenticated) {
+        const starButton = document.createElement('button');
+        starButton.type = 'button';
+        starButton.className = 'card-star-button';
+        starButton.dataset.action = 'star';
+        starButton.dataset.projectId = project.id;
+        starButton.title = project.starred_by_names || '';
+        starButton.setAttribute('aria-pressed', String(project.is_starred));
+        starButton.setAttribute(
+            'aria-label',
+            `${project.is_starred ? 'Remove star' : 'Add star'} (${project.star_count} stars)`,
+        );
+        starButton.textContent = project.star_count;
+        rightActions.appendChild(starButton);
+    } else {
+        const starCount = document.createElement('span');
+        starCount.className = 'star-count';
+        starCount.setAttribute('role', 'img');
+        starCount.setAttribute('aria-label', `${project.star_count} stars`);
+        starCount.textContent = project.star_count;
+        rightActions.appendChild(starCount);
+
+        const loginLink = document.createElement('a');
+        loginLink.className = 'button button-secondary';
+        loginLink.href = loginUrl;
+        loginLink.textContent = 'Login to star';
+        rightActions.appendChild(loginLink);
+    }
+
+    if (leftActions.childElementCount) actions.appendChild(leftActions);
+    actions.appendChild(rightActions);
     card.appendChild(actions);
     return card;
 }
