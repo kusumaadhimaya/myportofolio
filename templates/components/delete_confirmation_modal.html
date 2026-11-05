@@ -1,0 +1,32 @@
+<div id="delete-confirmation-modal"
+     class="skill-delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-confirmation-title">
+    <button type="button"
+            class="skill-delete-modal__backdrop"
+            popovertarget="delete-confirmation-modal"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+
+    <div class="skill-delete-modal__content">
+        <button type="button"
+                class="skill-delete-modal__close"
+                popovertarget="delete-confirmation-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        <h2 id="delete-confirmation-title">Hapus item?</h2>
+        <p id="delete-confirmation-message"></p>
+
+        <div class="skill-delete-modal__actions">
+            <button type="button"
+                    class="button button-secondary"
+                    popovertarget="delete-confirmation-modal"
+                    popovertargetaction="hide">Batal</button>
+            <button id="delete-confirmation-submit" type="button" class="button button-danger">
+                Ya, Hapus
+            </button>
+        </div>
+    </div>
+</div>

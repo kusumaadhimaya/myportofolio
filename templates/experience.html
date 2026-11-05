@@ -68,6 +68,10 @@
     {% include "components/experience_form_modal.html" %}
 {% endif %}
 
-<script src="{% static 'js/experience.js' %}?v=4" defer></script>
+{% if user.is_superuser %}
+    {% include "components/delete_confirmation_modal.html" %}
+    <script src="{% static 'js/delete_modal.js' %}?v=1" defer></script>
+{% endif %}
+<script src="{% static 'js/experience.js' %}?v=5" defer></script>
 
 {% endblock content %}
