@@ -13,9 +13,13 @@ const projectEmpty = document.getElementById('project-empty');
 const projectSearch = document.getElementById('project-search-input');
 const projectSearchForm = document.getElementById('project-search-form');
 const projectForm = document.getElementById('project-form');
+const projectModal = document.getElementById('add-project-modal');
+const projectModalTitle = document.getElementById('add-project-modal-title');
+const projectSubmitButton = document.getElementById('project-submit-button');
 
 let projectSearchTimer;
 let projectRequest;
+let editingProject = false;
 
 function showProjectState(state) {
     projectLoading.classList.toggle('hide', state !== 'loading');
@@ -78,7 +82,31 @@ function makeProjectCard(project) {
     card.appendChild(stack);
 
     const actions = document.createElement('div');
-    actions.className = 'project-actions';
+    actions.className = 'card-actions project-actions';
+    const leftActions = document.createElement('div');
+    leftActions.className = 'card-actions__left';
+    const rightActions = document.createElement('div');
+    rightActions.className = 'card-actions__right';
+
+    if (isSuperuser) {
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.className = 'button';
+        editButton.dataset.action = 'edit';
+        editButton.dataset.projectId = project.id;
+        editButton.textContent = 'Edit';
+        leftActions.appendChild(editButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'button button-danger';
+        deleteButton.dataset.action = 'delete';
+        deleteButton.dataset.projectId = project.id;
+        deleteButton.dataset.projectTitle = project.title;
+        deleteButton.textContent = 'Hapus';
+        leftActions.appendChild(deleteButton);
+    }
+
     const projectUrl = safeProjectUrl(project.project_url);
     if (projectUrl) {
         const link = document.createElement('a');
@@ -87,41 +115,40 @@ function makeProjectCard(project) {
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         link.textContent = 'Lihat Project';
-        actions.appendChild(link);
+        leftActions.appendChild(link);
     }
-
-    const starCount = document.createElement('span');
-    starCount.className = 'project-star-count';
-    starCount.textContent = `⭐ ${project.star_count}`;
-    actions.appendChild(starCount);
 
     if (isAuthenticated) {
         const starButton = document.createElement('button');
         starButton.type = 'button';
-        starButton.className = 'button button-secondary';
+        starButton.className = 'card-star-button';
         starButton.dataset.action = 'star';
         starButton.dataset.projectId = project.id;
         starButton.title = project.starred_by_names || '';
-        starButton.textContent = project.is_starred ? 'Unstar' : 'Star';
-        actions.appendChild(starButton);
+        starButton.setAttribute('aria-pressed', String(project.is_starred));
+        starButton.setAttribute(
+            'aria-label',
+            `${project.is_starred ? 'Remove star' : 'Add star'} (${project.star_count} stars)`,
+        );
+        starButton.textContent = project.star_count;
+        rightActions.appendChild(starButton);
     } else {
+        const starCount = document.createElement('span');
+        starCount.className = 'star-count';
+        starCount.setAttribute('role', 'img');
+        starCount.setAttribute('aria-label', `${project.star_count} stars`);
+        starCount.textContent = project.star_count;
+        rightActions.appendChild(starCount);
+
         const loginLink = document.createElement('a');
         loginLink.className = 'button button-secondary';
         loginLink.href = loginUrl;
         loginLink.textContent = 'Login to star';
-        actions.appendChild(loginLink);
+        rightActions.appendChild(loginLink);
     }
 
-    if (isSuperuser) {
-        const deleteButton = document.createElement('button');
-        deleteButton.type = 'button';
-        deleteButton.className = 'button button-danger';
-        deleteButton.dataset.action = 'delete';
-        deleteButton.dataset.projectId = project.id;
-        deleteButton.textContent = 'Hapus';
-        actions.appendChild(deleteButton);
-    }
-
+    if (leftActions.childElementCount) actions.appendChild(leftActions);
+    actions.appendChild(rightActions);
     card.appendChild(actions);
     return card;
 }
@@ -202,6 +229,35 @@ projectGrid.addEventListener('click', async event => {
 
     const action = button.dataset.action;
     const projectId = button.dataset.projectId;
+    if (action === 'edit') {
+        button.disabled = true;
+        try {
+            const response = await fetch(projectUrlFor(detailUrlTemplate, projectId), {
+                headers: { Accept: 'application/json' },
+            });
+            const project = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(projectApiErrorMessage(project, response.status));
+
+            editingProject = true;
+            projectForm.action = projectUrlFor(detailUrlTemplate, projectId);
+            projectForm.elements.namedItem('title').value = project.title;
+            projectForm.elements.namedItem('description').value = project.description;
+            projectForm.elements.namedItem('tech_stack').value = project.tech_stack;
+            projectForm.elements.namedItem('project_url').value = project.project_url;
+            projectForm.elements.namedItem('project_image_url').value = project.project_image_url;
+            projectModalTitle.textContent = 'Edit Project';
+            projectSubmitButton.textContent = 'Simpan Perubahan';
+            projectForm.querySelectorAll('.form-error').forEach(node => {
+                node.textContent = '';
+            });
+            projectModal.showPopover();
+        } catch (error) {
+            showToast('Gagal', error.message, 'error');
+        } finally {
+            button.disabled = false;
+        }
+        return;
+    }
     if (
         action === 'delete'
         && !window.confirm('Yakin ingin menghapus project ini?')
@@ -216,10 +272,14 @@ projectGrid.addEventListener('click', async event => {
     button.disabled = true;
 
     try {
-        await writeProject(projectUrlFor(endpointTemplate, projectId), method);
+        const data = await writeProject(projectUrlFor(endpointTemplate, projectId), method);
         showToast(
             'Berhasil',
-            action === 'star' ? 'Star project diperbarui.' : 'Project berhasil dihapus.',
+            action === 'star'
+                ? (data.is_starred
+                    ? `Anda memberi "${data.title}" star.`
+                    : 'Star dibatalkan.')
+                : `"${button.dataset.projectTitle}" berhasil dihapus.`,
             'success',
         );
         await fetchProjects(projectSearch.value.trim());
@@ -250,9 +310,10 @@ if (projectForm) {
         const submitButton = projectForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
+        const editing = editingProject;
         try {
             const response = await fetch(projectForm.action, {
-                method: 'POST',
+                method: editing ? 'PATCH' : 'POST',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -262,10 +323,20 @@ if (projectForm) {
             });
             const data = await response.json().catch(() => ({}));
 
-            if (response.status === 201) {
+            if ((editing && response.ok) || response.status === 201) {
                 projectForm.reset();
-                document.getElementById('add-project-modal').hidePopover();
-                showToast('Berhasil', 'Project berhasil ditambahkan.', 'success');
+                projectModal.hidePopover();
+                editingProject = false;
+                projectForm.action = projectsEndpoint;
+                projectModalTitle.textContent = 'Tambah Project Baru';
+                projectSubmitButton.textContent = 'Tambah Project';
+                showToast(
+                    'Berhasil',
+                    editing
+                        ? `"${data.title}" berhasil diperbarui.`
+                        : `"${data.title}" berhasil ditambahkan.`,
+                    'success',
+                );
                 await fetchProjects(projectSearch.value.trim());
             } else if (response.status === 400) {
                 Object.entries(data).forEach(([field, errors]) => {
@@ -292,5 +363,16 @@ if (projectForm) {
         }
     });
 }
+
+document.querySelector('[popovertarget="add-project-modal"]')?.addEventListener('click', () => {
+    editingProject = false;
+    projectForm.reset();
+    projectForm.action = projectsEndpoint;
+    projectModalTitle.textContent = 'Tambah Project Baru';
+    projectSubmitButton.textContent = 'Tambah Project';
+    projectForm.querySelectorAll('.form-error').forEach(node => {
+        node.textContent = '';
+    });
+});
 
 fetchProjects(projectSearch.value.trim());

@@ -5,22 +5,28 @@
 <title>Experience - {{ name }}</title>
 {% endblock meta %}
 
+{% block page_styles %}
+<link rel="stylesheet" href="{% static 'css/experience.css' %}">
+{% endblock page_styles %}
+
 {% block content %}
 <main>
-    <section class="experience-section" id="experience"
+    <section class="experience-section collection-section" id="experience"
              data-experiences-endpoint="{% url 'main:get_experiences_json' %}"
              data-create-endpoint="{% url 'main:create_experience_ajax' %}"
+             data-detail-url-template="{% url 'api:experience-detail' '00000000-0000-0000-0000-000000000000' %}"
              data-edit-url-template="{% url 'main:update_experience' '00000000-0000-0000-0000-000000000000' %}"
-             data-delete-url-template="{% url 'main:delete_experience' '00000000-0000-0000-0000-000000000000' %}"
+             data-star-url-template="{% url 'main:toggle_experience_star' '00000000-0000-0000-0000-000000000000' %}"
+             data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
              data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
              data-editor="{{ is_editor|yesno:'true,false' }}">
         <div class="container">
 
-            <div class="experience-header">
+            <div class="collection-header">
                 <h1 class="section-title">Experience</h1>
                 {% if user.is_superuser %}
                     <button type="button"
-                            class="button experience-add-button"
+                            class="button"
                             popovertarget="add-experience-modal">
                         <span aria-hidden="true">+</span>
                         Tambah Experience
@@ -28,14 +34,14 @@
                 {% endif %}
             </div>
 
-            <form id="experience-search-form" class="experience-search">
+            <form id="experience-search-form" class="collection-search">
                 <input
                     type="search"
                     id="search-input"
                     name="title"
                     value="{{ title_query }}"
                     placeholder="Cari berdasarkan judul experience"
-                    class="experience-search__input"
+                    class="collection-search__input"
                     aria-label="Cari berdasarkan judul experience">
                 <button type="submit" class="button">Cari</button>
             </form>
@@ -58,10 +64,10 @@
     </section>
 </main>
 
-{% if user.is_superuser %}
+{% if user.is_superuser or is_editor %}
     {% include "components/experience_form_modal.html" %}
 {% endif %}
 
-<script src="{% static 'js/experience.js' %}" defer></script>
+<script src="{% static 'js/experience.js' %}?v=4" defer></script>
 
 {% endblock content %}

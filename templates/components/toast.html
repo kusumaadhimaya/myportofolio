@@ -5,4 +5,11 @@
           <p id="toast-message" class="toast-message">This is a Sample Message</p>
       </div>
   </div>
+  {% if messages %}
+      <div id="django-toast-messages" hidden>
+          {% for message in messages %}
+              <div data-message="{{ message }}" data-tags="{{ message.tags }}"></div>
+          {% endfor %}
+      </div>
+  {% endif %}
   <script src="{% static 'js/toast.js' %}"></script>
