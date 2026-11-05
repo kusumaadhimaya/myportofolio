@@ -1,5 +1,3 @@
-from itertools import groupby
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -13,25 +11,8 @@ from main.models import Skill
 
 def show_skills(request):
     title_query = request.GET.get("title", "").strip()
-    skills = Skill.objects.all().order_by("category", "title")
-    if title_query:
-        skills = skills.filter(title__icontains=title_query)
-
-    grouped_skills = []
-    for category, category_skills in groupby(
-        skills,
-        key=lambda skill: skill.category or "Uncategorized",
-    ):
-        grouped_skills.append(
-            {
-                "category": category,
-                "skills": list(category_skills),
-            }
-        )
-
     context = {
         "name": "Kusuma Putra Abdillah Adhimaya",
-        "skills_list": grouped_skills,
         "title_query": title_query,
         "form": SkillForm(),
     }

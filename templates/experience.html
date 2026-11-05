@@ -15,7 +15,6 @@
              data-experiences-endpoint="{% url 'main:get_experiences_json' %}"
              data-create-endpoint="{% url 'main:create_experience_ajax' %}"
              data-detail-url-template="{% url 'api:experience-detail' '00000000-0000-0000-0000-000000000000' %}"
-             data-edit-url-template="{% url 'main:update_experience' '00000000-0000-0000-0000-000000000000' %}"
              data-star-url-template="{% url 'main:toggle_experience_star' '00000000-0000-0000-0000-000000000000' %}"
              data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
              data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
