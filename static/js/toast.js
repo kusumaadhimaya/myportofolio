@@ -41,3 +41,10 @@ function showToast(title, message, type = 'normal', duration = 3000) {
       toastTimer = setTimeout(() => toastComponent.hidePopover(), 300);
   }, duration);
 }
+
+document.querySelectorAll('#django-toast-messages [data-message]').forEach((node, index) => {
+  const tags = node.dataset.tags.split(' ');
+  const type = tags.includes('error') ? 'error' : tags.includes('success') ? 'success' : 'normal';
+  const title = type === 'error' ? 'Gagal' : type === 'success' ? 'Berhasil' : 'Informasi';
+  setTimeout(() => showToast(title, node.dataset.message, type), index * 3400);
+});

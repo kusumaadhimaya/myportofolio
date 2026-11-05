@@ -2,6 +2,7 @@ const categoriesContainer = document.getElementById('skill-categories');
 const skillsEndpoint = categoriesContainer.dataset.skillsEndpoint;
 const starUrlTemplate = categoriesContainer.dataset.starUrlTemplate;
 const deleteUrlTemplate = categoriesContainer.dataset.deleteUrlTemplate;
+const updateUrlTemplate = categoriesContainer.dataset.updateUrlTemplate;
 const isAuthenticated = categoriesContainer.dataset.authenticated === 'true';
 const isSuperuser = categoriesContainer.dataset.superuser === 'true';
 
@@ -11,6 +12,10 @@ const emptyState = document.getElementById('empty');
 const searchForm = document.getElementById('skill-search-form');
 const searchInput = document.getElementById('search-input');
 const skillForm = document.getElementById('skill-form');
+const skillModal = document.getElementById('add-skill-modal');
+const skillModalTitle = document.getElementById('add-skill-modal-title');
+const skillSubmitButton = document.getElementById('skill-submit-button');
+let editingSkill = false;
 
 const searchDebounceDelay = 300;
 let searchDebounceTimer;
@@ -76,6 +81,7 @@ function buildSkillCardElement(skill) {
         const starForm = document.createElement('form');
         starForm.method = 'POST';
         starForm.action = skillUrlFor(starUrlTemplate, skill.pk);
+        starForm.dataset.action = 'star';
         starForm.appendChild(createCsrfInput());
 
         const starButton = document.createElement('button');
@@ -99,20 +105,23 @@ function buildSkillCardElement(skill) {
     }
 
     if (isSuperuser) {
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.className = 'button';
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => openSkillEditor(skill));
+        leftActions.appendChild(editButton);
+
         const deleteForm = document.createElement('form');
         deleteForm.method = 'POST';
         deleteForm.action = skillUrlFor(deleteUrlTemplate, skill.pk);
+        deleteForm.dataset.action = 'delete';
         deleteForm.appendChild(createCsrfInput());
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'submit';
         deleteButton.className = 'button button-danger';
         deleteButton.textContent = 'Hapus';
-        deleteButton.addEventListener('click', event => {
-            if (!confirm('Apakah Anda yakin ingin menghapus skill ini?')) {
-                event.preventDefault();
-            }
-        });
         deleteForm.appendChild(deleteButton);
         leftActions.appendChild(deleteForm);
     }
@@ -121,6 +130,66 @@ function buildSkillCardElement(skill) {
     actions.appendChild(rightActions);
     article.appendChild(actions);
     return article;
+}
+
+categoriesContainer.addEventListener('submit', async event => {
+    const form = event.target.closest('form[data-action]');
+    if (!form) return;
+    event.preventDefault();
+
+    if (form.dataset.action === 'delete'
+        && !window.confirm('Apakah Anda yakin ingin menghapus skill ini?')) return;
+
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                Accept: 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.message || 'Permintaan skill gagal.');
+
+        showToast('Berhasil', data.message, 'success');
+        await fetchSkills(searchInput.value.trim());
+    } catch (error) {
+        showToast('Gagal', error.message, 'error');
+        button.disabled = false;
+    }
+});
+
+function clearSkillErrors() {
+    skillForm.querySelectorAll('.form-error').forEach(node => {
+        node.textContent = '';
+    });
+}
+
+function openSkillEditor(skill) {
+    editingSkill = true;
+    skillForm.action = skillUrlFor(updateUrlTemplate, skill.pk);
+    skillModalTitle.textContent = 'Edit Skill';
+    skillSubmitButton.textContent = 'Simpan Perubahan';
+    skillForm.elements.namedItem('title').value = skill.fields.title;
+    skillForm.elements.namedItem('description').value = skill.fields.description;
+    skillForm.elements.namedItem('category').value = skill.fields.category === 'Uncategorized'
+        ? ''
+        : skill.fields.category;
+    clearSkillErrors();
+    skillModal.showPopover();
+}
+
+function openSkillCreator() {
+    editingSkill = false;
+    skillForm.reset();
+    skillForm.action = categoriesContainer.dataset.createEndpoint;
+    skillModalTitle.textContent = 'Tambah Skill Baru';
+    skillSubmitButton.textContent = 'Tambah Skill';
+    clearSkillErrors();
 }
 
 function renderSkills(skills) {
@@ -188,6 +257,7 @@ if (skillForm) {
         const formData = new FormData(skillForm);
 
         try {
+            const editing = editingSkill;
             const response = await fetch(skillForm.action, {
                 method: 'POST',
                 body: formData,
@@ -195,10 +265,11 @@ if (skillForm) {
             });
             const data = await response.json();
 
-            if (response.status === 201) {
+            if (response.ok) {
                 showToast('Berhasil', data.message, 'success');
                 skillForm.reset();
-                document.getElementById('add-skill-modal').hidePopover();
+                skillModal.hidePopover();
+                openSkillCreator();
                 fetchSkills(searchInput.value.trim());
                 return;
             }
@@ -218,7 +289,7 @@ if (skillForm) {
                     }
                 });
                 showToast(
-                    'Gagal menambahkan skill',
+                    editing ? 'Gagal memperbarui skill' : 'Gagal menambahkan skill',
                     'Periksa kembali data yang dimasukkan.',
                     'error',
                 );
@@ -231,5 +302,7 @@ if (skillForm) {
         }
     });
 }
+
+document.querySelector('[popovertarget="add-skill-modal"]')?.addEventListener('click', openSkillCreator);
 
 fetchSkills(searchInput.value.trim());

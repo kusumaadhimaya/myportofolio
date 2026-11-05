@@ -64,7 +64,7 @@
             <div class="project-form-modal__actions">
                 <button type="button" class="button button-secondary" popovertarget="add-project-modal"
                         popovertargetaction="hide">Batal</button>
-                <button type="submit" class="button">Tambah Project</button>
+                <button id="project-submit-button" type="submit" class="button">Tambah Project</button>
             </div>
         </form>
     </div>
@@ -72,5 +72,5 @@
 {% endif %}
 
 {% csrf_token %}
-<script src="{% static 'js/projects.js' %}" defer></script>
+<script src="{% static 'js/projects.js' %}?v=2" defer></script>
 {% endblock content %}

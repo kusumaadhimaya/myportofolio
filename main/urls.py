@@ -7,6 +7,7 @@ from main.experience_views import (
     delete_experience,
     get_experiences_json,
     show_experience,
+    toggle_experience_star,
     update_experience,
 )
 from main.project_views import (
@@ -23,6 +24,7 @@ from main.skill_views import (
     get_skills_json,
     show_skills,
     toggle_skill_star,
+    update_skill_ajax,
 )
 from main.views import show_main
 
@@ -39,6 +41,7 @@ urlpatterns = [
     path("experience/add/", create_experience, name="create_experience"),
     path("experience/<uuid:experience_id>/edit/", update_experience, name="update_experience"),
     path("experience/<uuid:experience_id>/delete/", delete_experience, name="delete_experience"),
+    path("experience/<uuid:experience_id>/star/", toggle_experience_star, name="toggle_experience_star"),
     path("api/experiences/", get_experiences_json, name="get_experiences_json"),
     path("api/experiences/create/", create_experience_ajax, name="create_experience_ajax"),
 
@@ -46,6 +49,7 @@ urlpatterns = [
     path("skills/add/", create_skill, name="create_skill"),
     path("api/skills/", get_skills_json, name="get_skills_json"),
     path("api/skills/create/", create_skill_ajax, name="create_skill_ajax"),
+    path("api/skills/<uuid:skill_id>/update/", update_skill_ajax, name="update_skill_ajax"),
     path("skills/<uuid:skill_id>/delete/", delete_skill, name="delete_skill"),
     path("skills/<uuid:skill_id>/star/", toggle_skill_star, name="toggle_skill_star"),
 

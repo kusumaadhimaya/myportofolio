@@ -21,7 +21,7 @@
                     <button type="button"
                             class="button"
                             popovertarget="add-skill-modal">
-                        Tambah Skill
+                        <span aria-hidden="true">+</span> Tambah Skill
                     </button>
                 {% endif %}
             </div>
@@ -54,8 +54,10 @@
                     data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
                     data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
                     data-skills-endpoint="{% url 'main:get_skills_json' %}"
+                    data-create-endpoint="{% url 'main:create_skill_ajax' %}"
                     data-star-url-template="{% url 'main:toggle_skill_star' '00000000-0000-0000-0000-000000000000' %}"
-                    data-delete-url-template="{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}">
+                    data-delete-url-template="{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}"
+                    data-update-url-template="{% url 'main:update_skill_ajax' '00000000-0000-0000-0000-000000000000' %}">
             </div>
 
         </div>
@@ -119,7 +121,7 @@
                         Batal
                     </button>
 
-                    <button type="submit" class="button">
+                    <button id="skill-submit-button" type="submit" class="button">
                         Tambah Skill
                     </button>
 
@@ -130,6 +132,6 @@
     </div>
 {% endif %}
 
-<script src="{% static 'js/skills.js' %}" defer></script>
+<script src="{% static 'js/skills.js' %}?v=2" defer></script>
 
 {% endblock content %}

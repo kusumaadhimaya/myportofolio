@@ -45,7 +45,8 @@ def create_skill(request):
 
     form = SkillForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        skill = form.save()
+        messages.success(request, f'"{skill.title}" berhasil ditambahkan.')
         return redirect("main:show_skills")
 
     context = {
@@ -93,8 +94,34 @@ def create_skill_ajax(request):
     if form.is_valid():
         skill = form.save()
         return JsonResponse(
-            {"message": "Skill berhasil ditambahkan.", "pk": str(skill.id)},
+            {
+                "message": f'"{skill.title}" berhasil ditambahkan.',
+                "pk": str(skill.id),
+                "title": skill.title,
+            },
             status=201,
+        )
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+
+@login_required
+@require_POST
+def update_skill_ajax(request, skill_id):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat mengubah skill."},
+            status=403,
+        )
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+    form = SkillForm(request.POST, instance=skill)
+    if form.is_valid():
+        skill = form.save()
+        return JsonResponse(
+            {
+                "message": f'"{skill.title}" berhasil diperbarui.',
+                "title": skill.title,
+            }
         )
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
@@ -106,16 +133,31 @@ def delete_skill(request, skill_id):
 
     skill = get_object_or_404(Skill, pk=skill_id)
     if request.method == "POST":
+        title = skill.title
         skill.delete()
-        messages.success(request, "Skill berhasil dihapus!")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"message": f'"{title}" berhasil dihapus.'})
+        messages.success(request, f'"{title}" berhasil dihapus.')
     return redirect("main:show_skills")
 
 
 @login_required
+@require_POST
 def toggle_skill_star(request, skill_id):
     skill = get_object_or_404(Skill, pk=skill_id)
     if skill.starred_by.filter(id=request.user.id).exists():
         skill.starred_by.remove(request.user)
+        message = "Star dibatalkan."
     else:
         skill.starred_by.add(request.user)
+        message = f'Anda memberi "{skill.title}" star.'
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse(
+            {
+                "message": message,
+                "star_count": skill.starred_by.count(),
+                "is_starred": skill.starred_by.filter(pk=request.user.pk).exists(),
+            }
+        )
+    messages.success(request, message)
     return redirect("main:show_skills")

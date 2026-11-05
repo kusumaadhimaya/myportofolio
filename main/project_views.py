@@ -63,7 +63,7 @@ def create_project_ajax(request):
         project = form.save()
         return JsonResponse(
             {
-                "message": "Project berhasil ditambahkan.",
+                "message": f'"{project.title}" berhasil ditambahkan.',
                 "pk": str(project.id),
             },
             status=201,
@@ -81,8 +81,9 @@ def delete_project(request, project_id):
         raise PermissionDenied
 
     project = get_object_or_404(Project, pk=project_id)
+    title = project.title
     project.delete()
-    messages.success(request, "Project berhasil dihapus!")
+    messages.success(request, f'"{title}" berhasil dihapus.')
     return redirect("main:show_projects")
 
 
@@ -92,6 +93,8 @@ def toggle_project_star(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     if project.starred_by.filter(id=request.user.id).exists():
         project.starred_by.remove(request.user)
+        messages.success(request, "Star dibatalkan.")
     else:
         project.starred_by.add(request.user)
+        messages.success(request, f'Anda memberi "{project.title}" star.')
     return redirect("main:show_projects")
