@@ -16,12 +16,14 @@
              data-detail-url-template="{% url 'api:project-detail' '00000000-0000-0000-0000-000000000000' %}"
              data-star-url-template="{% url 'api:project-star' '00000000-0000-0000-0000-000000000000' %}"
              data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
-             data-superuser="{{ user.is_superuser|yesno:'true,false' }}">
+             data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
+             data-editor="{{ is_editor|yesno:'true,false' }}">
         <div class="container">
             <div class="collection-header">
                 <h1 class="section-title">Projects</h1>
                 {% if user.is_superuser %}
-                    <button type="button" class="button" popovertarget="add-project-modal">
+                    <button id="add-project-button" type="button" class="button"
+                            popovertarget="add-project-modal">
                         <span aria-hidden="true">+</span> Tambah Project
                     </button>
                 {% endif %}
@@ -42,12 +44,15 @@
     </section>
 </main>
 
-{% if user.is_superuser %}
+{% if user.is_superuser or is_editor %}
     {% include "components/project_form_modal.html" %}
+{% endif %}
+
+{% if user.is_superuser %}
     {% include "components/delete_confirmation_modal.html" %}
     <script src="{% static 'js/delete_modal.js' %}?v=1" defer></script>
 {% endif %}
 
 {% csrf_token %}
-<script src="{% static 'js/projects.js' %}?v=4" defer></script>
+<script src="{% static 'js/projects.js' %}?v=5" defer></script>
 {% endblock content %}

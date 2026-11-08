@@ -7,10 +7,7 @@ from django.views.decorators.http import require_POST
 
 from main.forms import ExperienceForm
 from main.models import Experience
-
-
-def is_editor(user):
-    return user.groups.filter(name="Editor").exists()
+from main.permissions import is_editor
 
 
 def show_experience(request):

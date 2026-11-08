@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 
 from main.forms import ProjectForm
 from main.models import Project
+from main.permissions import is_editor
 
 
 def show_projects(request):
@@ -15,6 +16,7 @@ def show_projects(request):
         "name": "Kusuma Putra Abdillah Adhimaya",
         "title_query": title_query,
         "form": ProjectForm(),
+        "is_editor": is_editor(request.user),
     }
     return render(request, "projects.html", context)
 

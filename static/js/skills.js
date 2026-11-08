@@ -5,6 +5,8 @@ const deleteUrlTemplate = categoriesContainer.dataset.deleteUrlTemplate;
 const updateUrlTemplate = categoriesContainer.dataset.updateUrlTemplate;
 const isAuthenticated = categoriesContainer.dataset.authenticated === 'true';
 const isSuperuser = categoriesContainer.dataset.superuser === 'true';
+const isEditor = categoriesContainer.dataset.editor === 'true';
+const canEditSkills = isSuperuser || isEditor;
 
 const loadingState = document.getElementById('loading');
 const errorState = document.getElementById('error');
@@ -104,14 +106,16 @@ function buildSkillCardElement(skill) {
         rightActions.appendChild(starCount);
     }
 
-    if (isSuperuser) {
+    if (canEditSkills) {
         const editButton = document.createElement('button');
         editButton.type = 'button';
         editButton.className = 'button';
         editButton.textContent = 'Edit';
         editButton.addEventListener('click', () => openSkillEditor(skill));
         leftActions.appendChild(editButton);
+    }
 
+    if (isSuperuser) {
         const deleteForm = document.createElement('form');
         deleteForm.method = 'POST';
         deleteForm.action = skillUrlFor(deleteUrlTemplate, skill.pk);
@@ -336,6 +340,6 @@ if (skillForm) {
     });
 }
 
-document.querySelector('[popovertarget="add-skill-modal"]')?.addEventListener('click', openSkillCreator);
+document.getElementById('add-skill-button')?.addEventListener('click', openSkillCreator);
 
 fetchSkills(searchInput.value.trim());

@@ -20,6 +20,7 @@
                 {% if user.is_superuser %}
                     <button type="button"
                             class="button"
+                            id="add-skill-button"
                             popovertarget="add-skill-modal">
                         <span aria-hidden="true">+</span> Tambah Skill
                     </button>
@@ -53,6 +54,7 @@
                     class="skill-categories hide"
                     data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
                     data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
+                    data-editor="{{ is_editor|yesno:'true,false' }}"
                     data-skills-endpoint="{% url 'main:get_skills_json' %}"
                     data-create-endpoint="{% url 'main:create_skill_ajax' %}"
                     data-star-url-template="{% url 'main:toggle_skill_star' '00000000-0000-0000-0000-000000000000' %}"
@@ -64,12 +66,15 @@
     </section>
 </main>
 
-{% if user.is_superuser %}
+{% if user.is_superuser or is_editor %}
     {% include "components/skill_form_modal.html" %}
+{% endif %}
+
+{% if user.is_superuser %}
     {% include "components/delete_confirmation_modal.html" %}
     <script src="{% static 'js/delete_modal.js' %}?v=1" defer></script>
 {% endif %}
 
-<script src="{% static 'js/skills.js' %}?v=3" defer></script>
+<script src="{% static 'js/skills.js' %}?v=4" defer></script>
 
 {% endblock content %}

@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -204,10 +204,36 @@ class ProjectAPITest(APITestCase):
         self.assertFalse(response.data["is_starred"])
         self.assertEqual(response.data["starred_by_names"], "")
 
-    def test_staff_and_editor_cannot_manage_tutorial_projects(self):
+    def test_editor_can_update_projects_but_cannot_create_or_delete(self):
+        editor = User.objects.create_user(
+            username="project-editor",
+            password="test-password",
+        )
+        editor.groups.create(name="Editor")
+        self.client.force_authenticate(user=editor)
+
+        update_response = self.client.patch(
+            self.detail_url,
+            {"title": "Changed"},
+            format="json",
+        )
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+        delete_response = self.client.delete(self.detail_url)
+
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(delete_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Changed")
+        self.assertEqual(Project.objects.count(), 1)
+
+    def test_staff_without_editor_role_cannot_update_projects(self):
         self.visitor.is_staff = True
         self.visitor.save()
-        self.visitor.groups.add(Group.objects.create(name="Editor"))
         self.client.force_authenticate(user=self.visitor)
 
         response = self.client.patch(
@@ -217,6 +243,8 @@ class ProjectAPITest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Portfolio")
 
     def test_wrong_method(self):
         self.client.force_authenticate(user=self.owner)

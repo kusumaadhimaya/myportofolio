@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 
 from main.forms import SkillForm
 from main.models import Skill
+from main.permissions import is_editor
 
 
 def show_skills(request):
@@ -15,6 +16,7 @@ def show_skills(request):
         "name": "Kusuma Putra Abdillah Adhimaya",
         "title_query": title_query,
         "form": SkillForm(),
+        "is_editor": is_editor(request.user),
     }
     return render(request, "skills.html", context)
 
@@ -88,9 +90,9 @@ def create_skill_ajax(request):
 @login_required
 @require_POST
 def update_skill_ajax(request, skill_id):
-    if not request.user.is_superuser:
+    if not (request.user.is_superuser or is_editor(request.user)):
         return JsonResponse(
-            {"message": "Hanya pemilik portofolio yang dapat mengubah skill."},
+            {"message": "Hanya pemilik portofolio atau editor yang dapat mengubah skill."},
             status=403,
         )
 
