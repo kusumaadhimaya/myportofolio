@@ -26,7 +26,10 @@ class ExperienceTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, 'data-experiences-endpoint="/api/experiences/"')
+        self.assertContains(
+            response,
+            'data-experiences-endpoint="/api/v1/experiences/"',
+        )
         self.assertContains(
             response,
             f'href="{reverse("main:show_main")}"'

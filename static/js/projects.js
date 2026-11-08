@@ -4,6 +4,8 @@ const detailUrlTemplate = projectPage.dataset.detailUrlTemplate;
 const starUrlTemplate = projectPage.dataset.starUrlTemplate;
 const isAuthenticated = projectPage.dataset.authenticated === 'true';
 const isSuperuser = projectPage.dataset.superuser === 'true';
+const isEditor = projectPage.dataset.editor === 'true';
+const canEditProjects = isSuperuser || isEditor;
 
 const projectGrid = document.getElementById('project-grid');
 const projectLoading = document.getElementById('project-loading');
@@ -87,7 +89,7 @@ function makeProjectCard(project) {
     const rightActions = document.createElement('div');
     rightActions.className = 'card-actions__right';
 
-    if (isSuperuser) {
+    if (canEditProjects) {
         const editButton = document.createElement('button');
         editButton.type = 'button';
         editButton.className = 'button';
@@ -95,7 +97,9 @@ function makeProjectCard(project) {
         editButton.dataset.projectId = project.id;
         editButton.textContent = 'Edit';
         leftActions.appendChild(editButton);
+    }
 
+    if (isSuperuser) {
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
         deleteButton.className = 'button button-danger';
@@ -372,7 +376,7 @@ if (projectForm) {
     });
 }
 
-document.querySelector('[popovertarget="add-project-modal"]')?.addEventListener('click', () => {
+document.getElementById('add-project-button')?.addEventListener('click', () => {
     editingProject = false;
     projectForm.reset();
     projectForm.action = projectsEndpoint;

@@ -69,8 +69,18 @@ function createDateLine(label, value) {
     return line;
 }
 
+function formatExperienceDate(value) {
+    if (!value) return '';
+    const [year, month, day] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    }).format(new Date(year, month - 1, day));
+}
+
 function buildExperienceCardElement(item) {
-    const experience = item.fields;
+    const experience = item;
     const article = document.createElement('article');
     article.className = 'experience-card';
 
@@ -100,14 +110,14 @@ function buildExperienceCardElement(item) {
 
     const dates = document.createElement('div');
     dates.className = 'experience-dates';
-    dates.appendChild(createDateLine('Mulai', experience.started_at));
+    dates.appendChild(createDateLine('Mulai', formatExperienceDate(experience.started_at)));
     if (experience.is_ongoing) {
         const ongoing = document.createElement('p');
         ongoing.className = 'experience-status';
         ongoing.textContent = 'Sedang berlangsung';
         dates.appendChild(ongoing);
     } else {
-        dates.appendChild(createDateLine('Selesai', experience.ended_at));
+        dates.appendChild(createDateLine('Selesai', formatExperienceDate(experience.ended_at)));
     }
     article.appendChild(dates);
 
@@ -123,7 +133,7 @@ function buildExperienceCardElement(item) {
             editButton.type = 'button';
             editButton.className = 'button';
             editButton.dataset.action = 'edit';
-            editButton.dataset.experienceId = item.pk;
+            editButton.dataset.experienceId = item.id;
             editButton.textContent = 'Edit';
             leftActions.appendChild(editButton);
 
@@ -132,7 +142,7 @@ function buildExperienceCardElement(item) {
                 deleteButton.type = 'button';
             deleteButton.className = 'button button-danger';
                 deleteButton.dataset.action = 'delete';
-                deleteButton.dataset.experienceId = item.pk;
+                deleteButton.dataset.experienceId = item.id;
             deleteButton.dataset.experienceTitle = experience.title;
             deleteButton.textContent = 'Hapus';
                 leftActions.appendChild(deleteButton);
@@ -144,7 +154,7 @@ function buildExperienceCardElement(item) {
         starButton.type = 'button';
         starButton.className = 'card-star-button';
         starButton.dataset.action = 'star';
-        starButton.dataset.experienceId = item.pk;
+        starButton.dataset.experienceId = item.id;
         starButton.setAttribute('aria-pressed', String(experience.is_starred));
         starButton.setAttribute('aria-label', `${experience.star_count} stars`);
         starButton.textContent = experience.star_count;
@@ -206,22 +216,17 @@ async function submitExperienceForm(event) {
                 '[name=csrfmiddlewaretoken]',
             ).value,
         };
+        headers['Content-Type'] = 'application/json';
         const request = {
             method: editingExperience ? 'PATCH' : 'POST',
             headers,
-        };
-
-        if (editingExperience) {
-            headers['Content-Type'] = 'application/json';
-            request.body = JSON.stringify(Object.fromEntries(
+            body: JSON.stringify(Object.fromEntries(
                 fields.map(name => [
                     name,
                     name === 'ended_at' ? (formData.get(name) || null) : formData.get(name),
                 ]),
-            ));
-        } else {
-            request.body = formData;
-        }
+            )),
+        };
 
         const response = await fetch(experienceForm.action, request);
         const data = await response.json().catch(() => ({}));
@@ -244,7 +249,7 @@ async function submitExperienceForm(event) {
 
         const message = editingExperience
             ? `"${data.title}" berhasil diperbarui.`
-            : data.message;
+            : `"${data.title}" berhasil ditambahkan.`;
         showToast('Berhasil', message, 'success');
         experienceForm.reset();
         experienceModal.hidePopover();
@@ -346,11 +351,11 @@ gridContainer.addEventListener('click', async event => {
 
     button.disabled = true;
     try {
-        const endpoint = action === 'star'
-            ? experienceUrlFor(starUrlTemplate, experienceId)
-            : experienceUrlFor(detailUrlTemplate, experienceId);
-        const data = await sendExperienceAction(endpoint, action === 'star' ? 'POST' : 'DELETE');
-        const message = data.message || `"${button.dataset.experienceTitle}" berhasil dihapus.`;
+        const endpoint = experienceUrlFor(starUrlTemplate, experienceId);
+        const data = await sendExperienceAction(endpoint, 'POST');
+        const message = data.is_starred
+            ? `Anda memberi "${data.title}" star.`
+            : 'Star dibatalkan.';
         showToast('Berhasil', message, 'success');
         await fetchExperiences(searchInput.value.trim());
     } catch (error) {

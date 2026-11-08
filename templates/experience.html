@@ -12,10 +12,10 @@
 {% block content %}
 <main>
     <section class="experience-section collection-section" id="experience"
-             data-experiences-endpoint="{% url 'main:get_experiences_json' %}"
-             data-create-endpoint="{% url 'main:create_experience_ajax' %}"
+             data-experiences-endpoint="{% url 'api:experience-list' %}"
+             data-create-endpoint="{% url 'api:experience-list' %}"
              data-detail-url-template="{% url 'api:experience-detail' '00000000-0000-0000-0000-000000000000' %}"
-             data-star-url-template="{% url 'main:toggle_experience_star' '00000000-0000-0000-0000-000000000000' %}"
+             data-star-url-template="{% url 'api:experience-star' '00000000-0000-0000-0000-000000000000' %}"
              data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
              data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
              data-editor="{{ is_editor|yesno:'true,false' }}">

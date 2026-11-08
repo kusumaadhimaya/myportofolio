@@ -19,6 +19,23 @@ class ProjectTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "projects.html")
 
+    def test_editor_gets_edit_form_but_not_project_creation_control(self):
+        editor = User.objects.create_user(
+            username="project-editor",
+            password="EditorPassword123!",
+        )
+        editor.groups.create(name="Editor")
+        self.client.login(
+            username="project-editor",
+            password="EditorPassword123!",
+        )
+
+        response = self.client.get(reverse("main:show_projects"))
+
+        self.assertContains(response, 'data-editor="true"')
+        self.assertContains(response, 'id="add-project-modal"')
+        self.assertNotContains(response, 'id="add-project-button"')
+
     def test_projects_json_returns_project_data(self):
         response = self.client.get(reverse("main:get_projects_json"))
 
