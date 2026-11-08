@@ -6,6 +6,8 @@ from main.models import Experience, Project, Skill
 
 class ExperienceSerializer(serializers.ModelSerializer):
     is_ongoing = serializers.SerializerMethodField()
+    star_count = serializers.SerializerMethodField()
+    is_starred = serializers.SerializerMethodField()
 
     class Meta:
         model = Experience
@@ -18,8 +20,10 @@ class ExperienceSerializer(serializers.ModelSerializer):
             "started_at",
             "ended_at",
             "is_ongoing",
+            "star_count",
+            "is_starred",
         ]
-        read_only_fields = ["id", "is_ongoing"]
+        read_only_fields = ["id", "is_ongoing", "star_count", "is_starred"]
 
     def validate_title(self, value):
         value = strip_tags(value).strip()
@@ -35,6 +39,17 @@ class ExperienceSerializer(serializers.ModelSerializer):
 
     def get_is_ongoing(self, obj):
         return obj.is_ongoing
+
+    def get_star_count(self, obj):
+        return obj.starred_by.count()
+
+    def get_is_starred(self, obj):
+        request = self.context.get("request")
+        return bool(
+            request
+            and request.user.is_authenticated
+            and obj.starred_by.filter(pk=request.user.pk).exists()
+        )
 
 
 class SkillSerializer(serializers.ModelSerializer):

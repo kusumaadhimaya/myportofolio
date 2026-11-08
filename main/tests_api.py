@@ -438,6 +438,10 @@ class ExperienceAPIPermissionTest(APITestCase):
             "api:experience-detail",
             args=[self.experience.id],
         )
+        self.star_url = reverse(
+            "api:experience-star",
+            args=[self.experience.id],
+        )
         self.payload = {
             "title": "Research Assistant",
             "description": "Working on a research project.",
@@ -453,10 +457,28 @@ class ExperienceAPIPermissionTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]["id"], str(self.experience.id))
         self.assertTrue(response.data[0]["is_ongoing"])
+        self.assertEqual(response.data[0]["star_count"], 0)
+        self.assertFalse(response.data[0]["is_starred"])
         self.assertEqual(
             self.client.get(self.detail_url).status_code,
             status.HTTP_200_OK,
         )
+
+    def test_star_requires_login_and_toggles(self):
+        self.assertEqual(
+            self.client.post(self.star_url).status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.client.force_authenticate(user=self.visitor)
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 1)
+
+        response = self.client.post(self.star_url)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 0)
 
     def test_editor_can_update_experience(self):
         self.client.force_authenticate(user=self.editor)
