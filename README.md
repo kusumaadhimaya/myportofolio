@@ -16,6 +16,7 @@
 - [Tugas 3](#tugas-3)
 - [Tugas 4](#tugas-4)
 - [Tugas 5](#tugas-5)
+- [Tugas 6](#tugas-6)
 - [AI Disclosure](#ai-disclosure)
 
 ---
@@ -71,6 +72,20 @@ Pada Tugas 4, tidak terdapat pertanyaan reflektif.
 2. `await` digunakan untuk menunggu hingga `fetch()` selesai dan menghasilkan response sebelum kode berikutnya dijalankan. Jika tidak menggunakan `await`, `fetch()` langsung mengembalikan `Promise`, sehingga kode berikutnya dapat berjalan sebelum response dari server tersedia. Akibatnya, kita tidak dapat langsung menggunakan hasil response tersebut.
 
 3. XSS (Cross-Site Scripting) adalah serangan dengan memasukkan kode HTML atau JavaScript berbahaya ke dalam data. AJAX/JavaScript lebih berisiko kalau data langsung dimasukkan sebagai HTML, misalnya dengan `innerHTML`, karena kode tersebut bisa dijalankan oleh browser. Karena itu, data dari AJAX harus di-escape atau ditampilkan dengan cara yang aman seperti `textContent`.
+
+**AI Disclosure:** [Lihat bagian AI Disclosure](#ai-disclosure)
+
+---
+
+## Tugas 6
+
+1. REST adalah gaya arsitektur API yang menggunakan resource dan aturan HTTP secara konsisten. Mengembalikan JSON saja belum cukup karena API juga perlu mengikuti prinsip REST, seperti menggunakan URL untuk resource dan method HTTP sesuai fungsinya. `PUT` digunakan untuk mengganti seluruh data, sedangkan `PATCH` digunakan untuk mengubah sebagian data. Contohnya, `PUT` cocok saat semua field dikirim ulang, sementara `PATCH` cocok untuk mengubah judul saja.
+
+2. Serializer mengubah data model Django menjadi format yang dapat dikirim lewat API dan memvalidasi data yang diterima. Dibandingkan merakit dictionary secara manual dengan `JsonResponse`, `ModelSerializer` lebih ringkas dan membantu menjaga proses representasi serta validasi data tetap konsisten.
+
+3. Autentikasi memeriksa siapa pengguna yang mengirim request, sedangkan otorisasi memeriksa tindakan apa yang boleh dilakukan pengguna tersebut. Permission class memeriksa hak akses di server untuk setiap request, sehingga aturan tetap berlaku meskipun seseorang mencoba memanggil API secara langsung. Menyembunyikan tombol di template hanya mengatur tampilan dan tidak cukup untuk melindungi data.
+
+4. `SessionAuthentication` menggunakan session login, sehingga request yang mengubah data tetap perlu token CSRF untuk memastikan request berasal dari halaman yang sah. `force_authenticate` langsung menetapkan pengguna pada test tanpa menjalankan proses login dan pemeriksaan CSRF seperti request session biasa, jadi test tersebut saja tidak membuktikan perlindungan CSRF bekerja.
 
 **AI Disclosure:** [Lihat bagian AI Disclosure](#ai-disclosure)
 
