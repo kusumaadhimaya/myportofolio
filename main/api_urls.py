@@ -22,4 +22,15 @@ urlpatterns = [
         api_views.experience_detail,
         name="experience-detail",
     ),
+    path("skills/", api_views.skill_list, name="skill-list"),
+    path(
+        "skills/<uuid:skill_id>/",
+        api_views.skill_detail,
+        name="skill-detail",
+    ),
+    path(
+        "skills/<uuid:skill_id>/star/",
+        api_views.skill_star,
+        name="skill-star",
+    ),
 ]

@@ -22,7 +22,7 @@
 
         <form id="skill-form"
               method="post"
-              action="{% url 'main:create_skill_ajax' %}"
+              action="{% url 'api:skill-list' %}"
               class="skill-form">
             {% csrf_token %}
 

@@ -5,7 +5,131 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import Experience, Project
+from main.models import Experience, Project, Skill
+
+
+class SkillAPITest(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser(
+            username="skill-api-owner",
+            password="test-password",
+            email="skill-api-owner@example.com",
+        )
+        self.editor = User.objects.create_user(
+            username="skill-api-editor",
+            password="test-password",
+        )
+        self.editor.groups.create(name="Editor")
+        self.visitor = User.objects.create_user(
+            username="skill-api-visitor",
+            password="test-password",
+        )
+        self.skill = Skill.objects.create(
+            title="Django",
+            description="Web framework",
+            category="backend",
+        )
+        self.list_url = reverse("api:skill-list")
+        self.detail_url = reverse("api:skill-detail", args=[self.skill.id])
+        self.star_url = reverse("api:skill-star", args=[self.skill.id])
+        self.payload = {
+            "title": "Python",
+            "description": "Programming language",
+            "category": "backend",
+        }
+
+    def test_public_list_search_and_detail(self):
+        response = self.client.get(self.list_url, {"title": "django"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], str(self.skill.id))
+        self.assertFalse(response.data[0]["is_starred"])
+        self.assertEqual(
+            self.client.get(self.detail_url).status_code,
+            status.HTTP_200_OK,
+        )
+
+    def test_owner_can_create_update_and_delete(self):
+        self.client.force_authenticate(user=self.owner)
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        created_url = reverse("api:skill-detail", args=[create_response.data["id"]])
+        update_response = self.client.patch(
+            created_url,
+            {"title": "Updated Python"},
+            format="json",
+        )
+        delete_response = self.client.delete(created_url)
+
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Skill.objects.filter(pk=create_response.data["id"]).exists())
+
+    def test_editor_can_update_but_not_create_or_delete(self):
+        self.client.force_authenticate(user=self.editor)
+        update_response = self.client.patch(
+            self.detail_url,
+            {"title": "Updated Django"},
+            format="json",
+        )
+        create_response = self.client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+        )
+        delete_response = self.client.delete(self.detail_url)
+
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(create_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(delete_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.skill.refresh_from_db()
+        self.assertEqual(self.skill.title, "Updated Django")
+        self.assertEqual(Skill.objects.count(), 1)
+
+    def test_regular_user_cannot_write_but_can_star(self):
+        self.client.force_authenticate(user=self.visitor)
+        self.assertEqual(
+            self.client.patch(
+                self.detail_url,
+                {"title": "Changed"},
+                format="json",
+            ).status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 1)
+
+    def test_star_requires_authentication_and_can_be_removed(self):
+        self.assertEqual(
+            self.client.post(self.star_url).status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.client.force_authenticate(user=self.visitor)
+        self.client.post(self.star_url)
+        response = self.client.post(self.star_url)
+
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 0)
+
+    def test_title_validation_rejects_blank_and_html_only(self):
+        self.client.force_authenticate(user=self.owner)
+        for title in (" ", "<b></b>"):
+            response = self.client.post(
+                self.list_url,
+                {**self.payload, "title": title},
+                format="json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn("title", response.data)
 
 
 class ProjectAPITest(APITestCase):

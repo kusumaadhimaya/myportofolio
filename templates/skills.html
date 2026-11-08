@@ -55,11 +55,9 @@
                     data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
                     data-superuser="{{ user.is_superuser|yesno:'true,false' }}"
                     data-editor="{{ is_editor|yesno:'true,false' }}"
-                    data-skills-endpoint="{% url 'main:get_skills_json' %}"
-                    data-create-endpoint="{% url 'main:create_skill_ajax' %}"
-                    data-star-url-template="{% url 'main:toggle_skill_star' '00000000-0000-0000-0000-000000000000' %}"
-                    data-delete-url-template="{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}"
-                    data-update-url-template="{% url 'main:update_skill_ajax' '00000000-0000-0000-0000-000000000000' %}">
+                    data-skills-endpoint="{% url 'api:skill-list' %}"
+                    data-detail-url-template="{% url 'api:skill-detail' '00000000-0000-0000-0000-000000000000' %}"
+                    data-star-url-template="{% url 'api:skill-star' '00000000-0000-0000-0000-000000000000' %}">
             </div>
 
         </div>
@@ -75,6 +73,6 @@
     <script src="{% static 'js/delete_modal.js' %}?v=1" defer></script>
 {% endif %}
 
-<script src="{% static 'js/skills.js' %}?v=4" defer></script>
+<script src="{% static 'js/skills.js' %}?v=5" defer></script>
 
 {% endblock content %}
